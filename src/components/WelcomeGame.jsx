@@ -11,7 +11,7 @@ const WelcomeGame = () => {
         </div>
 
         <div className="button-welcome">
-          <Link className="link" to="/playerInfo">
+          <Link className="link" to="/settings-game">
             <button className="button">Comenzar Juego</button>
           </Link>
         </div>
