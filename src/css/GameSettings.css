@@ -51,7 +51,7 @@
   display: flex;
   flex-direction: row-reverse;
   margin: 30px;
-  gap: 90px;
+  gap: 40px;
   justify-content: center;
   align-items: center;
 }
@@ -77,7 +77,7 @@
   transition: 0.3s ease;
   margin: 5px;
   width: 160px;
-  height: 50px;
+  height: 60px;
 }
 
 .button-ship:hover:not(:disabled) {
@@ -112,26 +112,79 @@
   align-items: center;
   justify-content: center;
   width: 300px;
-  height: 400px;
+  height: 325px;
+}
+
+.container-info {
+  display: flex;
+  gap: 130px;
+}
+
+.card-info {
+  background: rgba(26, 26, 26, 0.7);
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 69rem;
+  height: 20px;
+}
+
+.card-info-player {
+  background: rgba(26, 26, 26, 0.7);
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 290px;
+  height: 20px;
+}
+
+.card-info-pc {
+  background: rgba(26, 26, 26, 0.7);
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 290px;
+  height: 20px;
 }
 
 .board-grid {
   display: grid;
-  grid-template-columns: repeat(10, 50px);
+  grid-template-columns: repeat(10, 35px);
   gap: 2px;
   justify-content: center;
   align-items: center;
 }
 
 .board-cell {
-  width: 50px;
-  height: 50px;
+  width: 35px;
+  height: 35px;
   border: 1px solid #29f705da;
   background: #1a1a1a;
   box-shadow: 0 0 5px #29f705da;
   transition: 0.3s ease;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 3px;
   opacity: 0.9;
 }
 
@@ -165,10 +218,20 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 30px;
-  margin-bottom: 50px;
+  font-size: 25px;
+  margin-bottom: 40px;
   color: #fff;
   text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
+}
+
+.title-vs {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 50px;
+  color: #fff;
+  text-shadow: 0 0 30px #29f705da, 0 0 30px #29f705da;
+  font-weight: bold;
 }
 
 .title-label {
@@ -190,7 +253,7 @@
 
 .input {
   padding: 12px 16px;
-  width: 200px;
+  width: 300px;
   height: 10px;
   border-radius: 8px;
   border: 2px solid #29f705ae;
@@ -218,7 +281,7 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 160px;
+  width: 225px;
   height: 30px;
   text-decoration: none;
   text-align: center;
@@ -291,50 +354,155 @@
   background: #11111131;
 }
 
-/* Teléfonos pequeños */
+.button-reset {
+  display: flex;
+  padding: 12px 24px;
+  font-size: 17px;
+  background: #29f705ae;
+  color: #111111;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 200px;
+  height: 50px;
+  text-decoration: none;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-reset:hover {
+  background: #29f705da;
+}
+
+.button-back-setting {
+  display: flex;
+  padding: 12px 24px;
+  font-size: 17px;
+  background: #111111;
+  color: #29f705da;
+  border: 2px solid #29f705da;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 200px;
+  height: 50px;
+  text-decoration: none;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-back-setting :hover {
+  background: #11111131;
+}
+
+/* Colores para celdas del tablero */
+.board-cell.portaaviones {
+  background-color: #2171c1;
+}
+.board-cell.acorazado {
+  background-color: #31aa31;
+}
+.board-cell.crucero {
+  background-color: #d08e14;
+}
+.board-cell.submarino {
+  background-color: #7b087b;
+}
+
+.cell-hit {
+  background-color: #b73333 !important;
+}
+
+.cell-miss {
+  background-color: #1e90ff !important;
+}
+
+/*
+.
+.
+.
+.
+Teléfonos pequeños
+.
+.
+.
+.
+*/
+
 @media screen and (max-width: 480px) {
+  .card-info {
+    width: 15rem;
+    height: 0;
+    margin-bottom: 10px;
+  }
+
+  .card-info-player,
+  .card-info-pc {
+    width: 60px;
+    height: 0;
+  }
+
+  .container-info {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 10px;
+  }
+
+  .button-reset,
+  .button-back-setting {
+    font-size: 9px;
+    width: 130px;
+    height: 40px;
+  }
+
+  .title-vs {
+    font-size: 20px;
+  }
+
   .board-grid {
-    grid-template-columns: repeat(10, 30px);
+    grid-template-columns: repeat(10, 25px);
   }
 
   .board-cell {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
   }
 
   .container-form-boars {
     display: flex;
     flex-direction: column;
     margin: 0px;
-    gap: 30px;
+    gap: 10px;
   }
 
-  /* ---------------------------  */
   .container-buttons {
     gap: 2px;
     margin: 0;
   }
 
   .button-ship {
-    font-size: 10px;
-    width: 130px;
+    font-size: 9px;
+    width: 120px;
     height: 50px;
   }
 
   .card {
-    width: 240px;
+    width: 200px;
     height: 220px;
   }
 
   .title-h2 {
-    font-size: 25px;
+    font-size: 20px;
   }
 
   .container-title {
     display: flex;
   }
   .title-h3 {
-    font-size: 18px;
+    font-size: 15px;
     margin: 15px;
     margin-top: 0;
   }
@@ -348,13 +516,14 @@
   }
 
   .input {
-    width: 230px;
+    width: 210px;
     height: 5px;
+    font-size: 13px;
   }
 
   .select-direction {
     font-size: 13px;
-    width: 180px;
+    width: 165px;
     height: 25px;
   }
 
@@ -377,8 +546,44 @@
   }
 }
 
-/* Tablets y pantallas medianas */
-/* @media screen and (min-width: 481px) and (max-width: 768px) {
+/*
+.
+.
+.
+.
+Tablets y pantallas medianas
+.
+.
+.
+.
+*/
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .card-info {
+    width: 38rem;
+    height: 0;
+    margin-bottom: 10px;
+  }
+
+  .card-info-player,
+  .card-info-pc {
+    width: 240px;
+    height: 20px;
+  }
+
+  .container-info {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 15px;
+  }
+
+  .button-reset,
+  .button-back-setting {
+    font-size: 12px;
+    width: 160px;
+    height: 40px;
+  }
+
   .board-grid {
     grid-template-columns: repeat(10, 30px);
   }
@@ -390,14 +595,13 @@
 
   .container-form-boars {
     display: flex;
-    flex-direction: column;
+    flex-direction: row-reverse;
     margin: 0px;
-    gap: 30px;
+    gap: 10px;
   }
 
-
   .container-buttons {
-    gap: 2px;
+    gap: 10px;
     margin: 0;
   }
 
@@ -409,10 +613,15 @@
 
   .card {
     width: 240px;
-    height: 220px;
+    height: 270px;
   }
 
   .title-h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+  }
+
+  .title-vs {
     font-size: 30px;
   }
 
@@ -421,8 +630,7 @@
   }
   .title-h3 {
     font-size: 20px;
-    margin: 15px;
-    margin-top: 0;
+    margin-bottom: 30px;
   }
 
   .title-label {
@@ -452,7 +660,7 @@
   }
 
   .box-buttons {
-    margin: 5px;
+    margin: 20px;
   }
 
   .button-start,
@@ -461,4 +669,4 @@
     width: 120px;
     height: 40px;
   }
-} */
+}

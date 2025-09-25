@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import "../css/GameSettings.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { PlayerContext } from "../context/PlayerContext";
+import { useNavigate } from "react-router-dom";
 
 const ships = [
   { name: "Portaaviones", size: 5, count: 1 },
@@ -9,19 +12,23 @@ const ships = [
   { name: "Submarino", size: 2, count: 2 },
 ];
 
+function createEmptyBoard() {
+  return Array(10)
+    .fill(null)
+    .map(() => Array(10).fill(null));
+}
+
 const GameSettings = () => {
+  const { setPlayer, setPlayerBoard } = useContext(PlayerContext);
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
-  const [playerBoard, setPlayerBoard] = useState(createEmptyBoard());
+  const [localBoard, setLocalBoard] = useState(createEmptyBoard());
+
   const [selectedShip, setSelectedShip] = useState(null);
   const [orientation, setOrientation] = useState("horizontal");
   const [placedShips, setPlacedShips] = useState({});
   const [message, setMessage] = useState("");
-
-  function createEmptyBoard() {
-    return Array(10)
-      .fill(null)
-      .map(() => Array(10).fill(null));
-  }
 
   const handleCellClick = (x, y) => {
     if (!selectedShip) return;
@@ -31,12 +38,11 @@ const GameSettings = () => {
       setMessage(`Ya colocaste todos los "${selectedShip.name}".`);
       setTimeout(() => {
         setMessage("");
-      }, 2000);
-
+      }, 3000);
       return;
     }
 
-    const newBoard = playerBoard.map((row) => [...row]);
+    const newBoard = localBoard.map((row) => [...row]);
     const size = selectedShip.size;
 
     let canPlace = true;
@@ -56,7 +62,7 @@ const GameSettings = () => {
         const yi = orientation === "horizontal" ? y + i : y;
         newBoard[xi][yi] = selectedShip.name;
       }
-      setPlayerBoard(newBoard);
+      setLocalBoard(newBoard);
       setPlacedShips((prev) => ({
         ...prev,
         [selectedShip.name]: currentCount + 1,
@@ -66,10 +72,33 @@ const GameSettings = () => {
 
   const reset = () => {
     setName("");
-    setPlayerBoard(createEmptyBoard());
+    setLocalBoard(createEmptyBoard());
     setPlacedShips({});
     setOrientation("horizontal");
     setSelectedShip(null);
+    setPlayerBoard([]);
+  };
+
+  const handleShipSelect = (e, ship) => {
+    e.preventDefault();
+    setSelectedShip(ship);
+    setMessage("");
+  };
+
+  const isReadyToPlay =
+    name.trim() !== "" &&
+    ships.every((ship) => (placedShips[ship.name] || 0) === ship.count);
+
+  const handleStartClick = (e) => {
+    if (!isReadyToPlay) {
+      e.preventDefault();
+      setMessage("Debes ingresar tu nombre y colocar todos los barcos.");
+      setTimeout(() => setMessage(""), 3000);
+    } else {
+      setPlayer(name);
+      setPlayerBoard(localBoard);
+      navigate("/game");
+    }
   };
 
   return (
@@ -123,11 +152,7 @@ const GameSettings = () => {
                           }`}
                           key={ship.name}
                           disabled={remaining === 0}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setSelectedShip(ship);
-                            setMessage("");
-                          }}
+                          onClick={(e) => handleShipSelect(e, ship)}
                         >
                           {ship.name} ({ship.size} celdas) <br /> Cantidad:{" "}
                           {remaining}
@@ -140,12 +165,12 @@ const GameSettings = () => {
             </div>
 
             <div className="board-grid">
-              {playerBoard.map((row, x) =>
+              {localBoard.map((row, x) =>
                 row.map((cell, y) => (
                   <div
                     key={`${x}-${y}`}
                     onClick={() => handleCellClick(x, y)}
-                    className={`board-cell ${cell ? "filled" : ""}`}
+                    className={`board-cell ${cell ? cell.toLowerCase() : ""}`}
                   />
                 ))
               )}
@@ -155,12 +180,14 @@ const GameSettings = () => {
           <section className="box-buttons">
             <Link className="link">
               <button className="button-back" onClick={reset}>
-                Reiniciar
+                Restablecer
               </button>
             </Link>
 
-            <Link className="link" to="/game">
-              <button className="button-start">Jugar</button>
+            <Link className="link" to={isReadyToPlay ? "/game" : "#"}>
+              <button className="button-start" onClick={handleStartClick}>
+                Comenzar
+              </button>
             </Link>
           </section>
         </div>
