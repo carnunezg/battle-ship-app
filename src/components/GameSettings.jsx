@@ -154,8 +154,8 @@ const GameSettings = () => {
                           disabled={remaining === 0}
                           onClick={(e) => handleShipSelect(e, ship)}
                         >
-                          {ship.name} ({ship.size} celdas) <br /> Cantidad:{" "}
-                          {remaining}
+                          {ship.name} <br /> ({ship.size} celdas) <br />{" "}
+                          Cantidad: {remaining}
                         </button>
                       );
                     })}

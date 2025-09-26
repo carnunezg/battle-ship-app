@@ -18,9 +18,19 @@ const GameBattleShip = () => {
   const { player, playerBoard } = useContext(PlayerContext);
   const [computerBoard, setComputerBoard] = useState([]);
   const [shots, setShots] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
 
   useEffect(() => {
     setComputerBoard(generateComputerBoard());
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const generateComputerBoard = () => {
@@ -83,8 +93,6 @@ const GameBattleShip = () => {
   return (
     <main className="background-animated">
       <section className="modal">
-        <h2 className="title-h2">Bienvenido a la Batalla</h2>
-
         <section className="container-info">
           <div className="card-info-player">
             <h3 className="title-h3">{player || "Jugador"}</h3>
@@ -128,11 +136,13 @@ const GameBattleShip = () => {
 
         <div className="box-buttons">
           <Link className="link" to="/settings-game">
-            <button className="button-back-setting">Volver a configurar</button>
+            <button className="button-back-setting">
+              {isMobile ? "Volver" : "Volver a configurar"}
+            </button>
           </Link>
           <Link className="link">
             <button className="button-reset" onClick={resetGame}>
-              Reiniciar Juego
+              {isMobile ? "Reiniciar" : "Reiniciar Juego"}
             </button>
           </Link>
         </div>

@@ -441,7 +441,7 @@ Teléfonos pequeños
 
   .card-info-player,
   .card-info-pc {
-    width: 60px;
+    width: 50px;
     height: 0;
   }
 
@@ -454,28 +454,28 @@ Teléfonos pequeños
   .button-reset,
   .button-back-setting {
     font-size: 9px;
-    width: 130px;
-    height: 40px;
+    width: 70px;
+    height: 0px;
   }
 
   .title-vs {
-    font-size: 20px;
+    font-size: 15px;
   }
 
   .board-grid {
-    grid-template-columns: repeat(10, 25px);
+    grid-template-columns: repeat(10, 20px);
   }
 
   .board-cell {
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
   }
 
   .container-form-boars {
     display: flex;
     flex-direction: column;
     margin: 0px;
-    gap: 10px;
+    gap: 5px;
   }
 
   .container-buttons {
@@ -485,45 +485,45 @@ Teléfonos pequeños
 
   .button-ship {
     font-size: 9px;
-    width: 120px;
+    text-align: center;
+    width: 90px;
     height: 50px;
   }
 
   .card {
-    width: 200px;
-    height: 220px;
+    width: 140px;
+    height: 190px;
   }
 
   .title-h2 {
-    font-size: 20px;
+    font-size: 15px;
   }
 
   .container-title {
     display: flex;
   }
   .title-h3 {
-    font-size: 15px;
-    margin: 15px;
-    margin-top: 0;
+    font-size: 13px;
+    margin-bottom: 20px;
   }
 
   .title-label {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .container-form {
-    gap: 15px;
+    gap: 8px;
   }
 
   .input {
-    width: 210px;
-    height: 5px;
-    font-size: 13px;
+    width: 160px;
+    height: 2px;
+    font-size: 12px;
   }
 
   .select-direction {
-    font-size: 13px;
-    width: 165px;
+    font-size: 12px;
+    width: 120px;
     height: 25px;
   }
 
@@ -540,9 +540,9 @@ Teléfonos pequeños
 
   .button-start,
   .button-back {
-    font-size: 15px;
-    width: 120px;
-    height: 40px;
+    font-size: 9px;
+    width: 80px;
+    height: 20px;
   }
 }
 
