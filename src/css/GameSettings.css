@@ -33,18 +33,70 @@
   align-items: center;
 }
 
+@keyframes slideInCenter {
+  from {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
 .message-warning {
-  position: absolute;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: #ff2727;
   font-weight: bold;
-  margin-top: 10px;
-  text-align: center;
   background: #111111;
-  padding: 10px;
+  padding: 10px 20px;
   border-radius: 8px;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
-  margin-left: -300px;
+  z-index: 1000;
+  text-align: center;
+  animation: slideInCenter 0.5s ease-out forwards;
+}
+
+.message-winner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #29f705da;
+  font-weight: bold;
+  background: rgba(33, 33, 33, 0.9);
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  z-index: 1000;
+  text-align: center;
+  width: 500px;
+  height: 150px;
+  font-size: 20px;
+}
+
+.message-game-over {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff2727;
+  font-weight: bold;
+  background: rgba(33, 33, 33, 0.9);
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  z-index: 1000;
+  text-align: center;
+  width: 500px;
+  height: 150px;
+  font-size: 20px;
 }
 
 .container-form-boars {
@@ -63,7 +115,6 @@
   gap: 10px;
   justify-items: center;
   align-items: center;
-  margin: 20px 0;
 }
 
 .button-ship {
@@ -140,13 +191,12 @@
   background: rgba(26, 26, 26, 0.7);
   padding: 30px 40px;
   border-radius: 12px;
-  text-align: center;
   color: white;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   width: 290px;
   height: 20px;
@@ -156,13 +206,12 @@
   background: rgba(26, 26, 26, 0.7);
   padding: 30px 40px;
   border-radius: 12px;
-  text-align: center;
   color: white;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   width: 290px;
   height: 20px;
@@ -180,6 +229,7 @@
   width: 35px;
   height: 35px;
   border: 1px solid #29f705da;
+  position: relative;
   background: #1a1a1a;
   box-shadow: 0 0 5px #29f705da;
   transition: 0.3s ease;
@@ -222,6 +272,17 @@
   margin-bottom: 40px;
   color: #fff;
   text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
+}
+
+.date-info {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 25px;
+  color: #fff;
+  text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
+  padding: 0;
+  margin: 0;
 }
 
 .title-vs {
@@ -298,7 +359,23 @@
 .container-select {
   display: flex;
   flex-direction: row;
-  gap: 2px;
+  gap: 80px;
+}
+
+.radio-label {
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 15px;
+  color: #29f705da;
+  text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
+}
+
+input[type="radio"] {
+  accent-color: #29f705da;
+  margin-right: 5px;
+  transform: scale(1.3);
 }
 
 .box-buttons {
@@ -413,11 +490,47 @@
 }
 
 .cell-hit {
-  background-color: #b73333 !important;
+  background-color: #1a1a1a !important;
+  background-image: url("/icons/explosion1.gif");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.cell-hit:hover {
+  background-color: #1a1a1a !important;
+  background-image: url("/icons/explosion1.gif");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .cell-miss {
-  background-color: #1e90ff !important;
+  background-color: #1a1a1a !important;
+  background-image: url("/icons/mar.gif");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.cell-miss:hover {
+  background-color: #1a1a1a !important;
+  background-image: url("/icons/mar.gif");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.date-info {
+  display: flex;
+  flex-direction: row;
+  font-size: 20px;
+  color: #29f705da;
+}
+
+.name-player {
+  font-size: 20px;
+  color: #fff;
 }
 
 /*
@@ -439,10 +552,45 @@ Teléfonos pequeños
     margin-bottom: 10px;
   }
 
+  .message-warning {
+    font-size: 12px;
+    width: 200px;
+  }
+
+  .message-winner {
+    width: 250px;
+    height: 90px;
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .message-game-over {
+    width: 400px;
+    height: 130px;
+    font-size: 18px;
+  }
+
   .card-info-player,
   .card-info-pc {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
     width: 50px;
     height: 0;
+  }
+
+  .date-info {
+    font-size: 8px;
+    color: #29f705da;
+    padding: 0;
+    margin: 0;
+  }
+
+  .name-player {
+    font-size: 8px;
+    color: #fff;
+    padding: 0;
+    margin: 0;
   }
 
   .container-info {
@@ -512,12 +660,12 @@ Teléfonos pequeños
   }
 
   .container-form {
-    gap: 8px;
+    gap: 2px;
   }
 
   .input {
-    width: 160px;
-    height: 2px;
+    width: 155px;
+    height: 0px;
     font-size: 12px;
   }
 
@@ -532,6 +680,21 @@ Teléfonos pequeños
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    margin: 0;
+  }
+
+  .container-select {
+    gap: 30px;
+  }
+
+  .radio-label {
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  input[type="radio"] {
+    margin-right: 5px;
+    transform: scale(1.1);
   }
 
   .box-buttons {
@@ -565,10 +728,39 @@ Tablets y pantallas medianas
     margin-bottom: 10px;
   }
 
+  .message-warning {
+    font-size: 16px;
+    width: 400px;
+  }
+
+  .message-winner {
+    width: 400px;
+    height: 130px;
+    font-size: 18px;
+  }
+
+  .message-game-over {
+    width: 400px;
+    height: 130px;
+    font-size: 18px;
+  }
+
   .card-info-player,
   .card-info-pc {
     width: 240px;
     height: 20px;
+  }
+
+  .date-info {
+    display: flex;
+    flex-direction: row;
+    font-size: 15px;
+    color: #29f705da;
+  }
+
+  .name-player {
+    font-size: 15px;
+    color: #fff;
   }
 
   .container-info {
@@ -653,10 +845,17 @@ Tablets y pantallas medianas
   }
 
   .container-select {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    gap: 60px;
+  }
+
+  .radio-label {
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  input[type="radio"] {
+    margin-right: 5px;
+    transform: scale(1.1);
   }
 
   .box-buttons {

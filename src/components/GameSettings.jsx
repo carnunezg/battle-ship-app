@@ -31,7 +31,11 @@ const GameSettings = () => {
   const [message, setMessage] = useState("");
 
   const handleCellClick = (x, y) => {
-    if (!selectedShip) return;
+    if (!selectedShip) {
+      setMessage("Debes seleccionar un barco antes de colocar.");
+      setTimeout(() => setMessage(""), 3000);
+      return;
+    }
 
     const currentCount = placedShips[selectedShip.name] || 0;
     if (currentCount >= selectedShip.count) {
@@ -45,29 +49,36 @@ const GameSettings = () => {
     const newBoard = localBoard.map((row) => [...row]);
     const size = selectedShip.size;
 
-    let canPlace = true;
     for (let i = 0; i < size; i++) {
       const xi = orientation === "vertical" ? x + i : x;
       const yi = orientation === "horizontal" ? y + i : y;
 
-      if (xi >= 10 || yi >= 10 || newBoard[xi][yi]) {
-        canPlace = false;
-        break;
+      if (xi >= 10 || yi >= 10) {
+        setMessage(
+          `Selecciona un área que contenga ${size} celdas disponibles.`
+        );
+        setTimeout(() => setMessage(""), 3000);
+        return;
+      }
+
+      if (newBoard[xi][yi]) {
+        setMessage("No puedes colocar el barco sobre otra pieza.");
+        setTimeout(() => setMessage(""), 3000);
+        return;
       }
     }
 
-    if (canPlace) {
-      for (let i = 0; i < size; i++) {
-        const xi = orientation === "vertical" ? x + i : x;
-        const yi = orientation === "horizontal" ? y + i : y;
-        newBoard[xi][yi] = selectedShip.name;
-      }
-      setLocalBoard(newBoard);
-      setPlacedShips((prev) => ({
-        ...prev,
-        [selectedShip.name]: currentCount + 1,
-      }));
+    for (let i = 0; i < size; i++) {
+      const xi = orientation === "vertical" ? x + i : x;
+      const yi = orientation === "horizontal" ? y + i : y;
+      newBoard[xi][yi] = selectedShip.name;
     }
+
+    setLocalBoard(newBoard);
+    setPlacedShips((prev) => ({
+      ...prev,
+      [selectedShip.name]: currentCount + 1,
+    }));
   };
 
   const reset = () => {
@@ -129,15 +140,26 @@ const GameSettings = () => {
                 />
 
                 <div className="container-select">
-                  <label className="title-label">Orientación: </label> <br />
-                  <select
-                    className="select-direction"
-                    value={orientation}
-                    onChange={(e) => setOrientation(e.target.value)}
-                  >
-                    <option value="horizontal">Horizontal</option>
-                    <option value="vertical">Vertical</option>
-                  </select>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="orientation"
+                      value="horizontal"
+                      checked={orientation === "horizontal"}
+                      onChange={(e) => setOrientation(e.target.value)}
+                    />
+                    Horizontal
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="orientation"
+                      value="vertical"
+                      checked={orientation === "vertical"}
+                      onChange={(e) => setOrientation(e.target.value)}
+                    />
+                    Vertical
+                  </label>
                 </div>
 
                 <div>
