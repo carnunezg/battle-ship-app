@@ -1,14 +1,10 @@
 import { createContext, useState } from "react";
+import { createEmptyBoard } from "../utils/createEmptyBoard";
 
 export const PlayerContext = createContext();
 
 export const PlayerProvider = ({ children }) => {
   const [player, setPlayer] = useState("");
-
-  const createEmptyBoard = () =>
-    Array(10)
-      .fill(null)
-      .map(() => Array(10).fill(null));
 
   const [playerBoard, setPlayerBoard] = useState(createEmptyBoard());
 

@@ -1,22 +1,11 @@
 import { Link } from "react-router-dom";
 import "../css/GameSettings.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useContext } from "react";
 import { PlayerContext } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
-
-const ships = [
-  { name: "Portaaviones", size: 5, count: 1 },
-  { name: "Acorazado", size: 4, count: 1 },
-  { name: "Crucero", size: 3, count: 2 },
-  { name: "Submarino", size: 2, count: 2 },
-];
-
-function createEmptyBoard() {
-  return Array(10)
-    .fill(null)
-    .map(() => Array(10).fill(null));
-}
+import { ships } from "../utils/consts";
+import { createEmptyBoard } from "../utils/createEmptyBoard";
 
 const GameSettings = () => {
   const { setPlayer, setPlayerBoard } = useContext(PlayerContext);
@@ -49,30 +38,29 @@ const GameSettings = () => {
     const newBoard = localBoard.map((row) => [...row]);
     const size = selectedShip.size;
 
-    for (let i = 0; i < size; i++) {
+    let validPlacement = true;
+    const positions = [];
+
+    Array.from({ length: size }).forEach((_, i) => {
       const xi = orientation === "vertical" ? x + i : x;
       const yi = orientation === "horizontal" ? y + i : y;
 
-      if (xi >= 10 || yi >= 10) {
-        setMessage(
-          `Selecciona un área que contenga ${size} celdas disponibles.`
-        );
-        setTimeout(() => setMessage(""), 3000);
-        return;
+      if (xi >= 10 || yi >= 10 || newBoard[xi][yi]) {
+        validPlacement = false;
+      } else {
+        positions.push({ xi, yi });
       }
+    });
 
-      if (newBoard[xi][yi]) {
-        setMessage("No puedes colocar el barco sobre otra pieza.");
-        setTimeout(() => setMessage(""), 3000);
-        return;
-      }
+    if (!validPlacement) {
+      setMessage("No puedes colocar el barco en esa posición.");
+      setTimeout(() => setMessage(""), 3000);
+      return;
     }
 
-    for (let i = 0; i < size; i++) {
-      const xi = orientation === "vertical" ? x + i : x;
-      const yi = orientation === "horizontal" ? y + i : y;
-      newBoard[xi][yi] = selectedShip.name;
-    }
+    positions.forEach(({ xi, yi }) => {
+      newBoard[xi][yi] = `${selectedShip.name}-${currentCount + 1}`;
+    });
 
     setLocalBoard(newBoard);
     setPlacedShips((prev) => ({
@@ -192,7 +180,9 @@ const GameSettings = () => {
                   <div
                     key={`${x}-${y}`}
                     onClick={() => handleCellClick(x, y)}
-                    className={`board-cell ${cell ? cell.toLowerCase() : ""}`}
+                    className={`board-cell ${
+                      cell ? cell.split("-")[0].toLowerCase() : ""
+                    }`}
                   />
                 ))
               )}

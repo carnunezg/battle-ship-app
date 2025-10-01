@@ -1,22 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PlayerContext } from "../context/PlayerContext";
-import confetti from "canvas-confetti";
-
-const ships = [
-  { name: "Portaaviones", size: 5, count: 1 },
-  { name: "Acorazado", size: 4, count: 1 },
-  { name: "Crucero", size: 3, count: 2 },
-  { name: "Submarino", size: 2, count: 2 },
-];
-
-const createEmptyBoard = () =>
-  Array(10)
-    .fill(null)
-    .map(() => Array(10).fill(null));
+import { ships } from "../utils/consts";
+import { createEmptyBoard } from "../utils/createEmptyBoard";
+import { launchConfetti } from "../utils/launchConfetti";
 
 const GameBattleShip = () => {
   const { player, playerBoard } = useContext(PlayerContext);
+
   const [computerBoard, setComputerBoard] = useState([]);
   const [shots, setShots] = useState([]);
   const [turn, setTurn] = useState("player");
@@ -27,18 +18,8 @@ const GameBattleShip = () => {
   const [gameOver, setGameOver] = useState(false);
   const [messageWinner, setMessageWinner] = useState("");
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
-
   const totalComputerShips = ships.reduce((acc, ship) => acc + ship.count, 0);
   const totalPlayerShips = ships.reduce((acc, ship) => acc + ship.count, 0);
-
-  const launchConfetti = () => {
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-  };
 
   useEffect(() => {
     setComputerBoard(generateComputerBoard());
@@ -49,40 +30,17 @@ const GameBattleShip = () => {
   }, [computerBoard]);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 480);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
     if (turn === "computer") {
-      const timeout = setTimeout(() => {
+      setTimeout(() => {
         computerShoot();
       }, 500);
-
-      return () => clearTimeout(timeout);
     }
-  }, [turn, gameOver]);
-
-  useEffect(() => {
-    if (sunkComputerShips.length === totalComputerShips) {
-      setMessageWinner("Hundiste todos los barcos del Computador.");
-      launchConfetti();
-      setTimeout(() => {
-        setMessageWinner("");
-      }, 4000);
-    } else if (sunkPlayerShips.length === totalPlayerShips) {
-      setMessageWinner("El Computador hundió todos tus barcos.");
-    }
-  }, [sunkComputerShips, sunkPlayerShips]);
+  }, [turn]);
 
   const generateComputerBoard = () => {
     const board = createEmptyBoard();
 
-    for (const ship of ships) {
+    ships.forEach((ship) => {
       let placed = 0;
 
       while (placed < ship.count) {
@@ -91,36 +49,29 @@ const GameBattleShip = () => {
         const y = Math.floor(Math.random() * 10);
 
         let canPlace = true;
+        const positions = [];
 
-        if (
-          (orientation === "horizontal" && y + ship.size > 10) ||
-          (orientation === "vertical" && x + ship.size > 10)
-        ) {
-          canPlace = false;
-        }
+        // Validar posiciones
+        Array.from({ length: ship.size }).forEach((_, i) => {
+          const xi = orientation === "vertical" ? x + i : x;
+          const yi = orientation === "horizontal" ? y + i : y;
 
-        if (canPlace) {
-          for (let i = 0; i < ship.size; i++) {
-            const xi = orientation === "vertical" ? x + i : x;
-            const yi = orientation === "horizontal" ? y + i : y;
-
-            if (board[xi][yi]) {
-              canPlace = false;
-              break;
-            }
+          if (xi >= 10 || yi >= 10 || board[xi][yi]) {
+            canPlace = false;
+          } else {
+            positions.push({ xi, yi });
           }
-        }
+        });
 
+        // Colocar barco si es válido
         if (canPlace) {
-          for (let i = 0; i < ship.size; i++) {
-            const xi = orientation === "vertical" ? x + i : x;
-            const yi = orientation === "horizontal" ? y + i : y;
+          positions.forEach(({ xi, yi }) => {
             board[xi][yi] = `${ship.name}-${placed + 1}`;
-          }
+          });
           placed++;
         }
       }
-    }
+    });
 
     return board;
   };
@@ -155,11 +106,22 @@ const GameBattleShip = () => {
         !sunkComputerShips.includes(shipName) &&
         checkIfShipSunk(computerBoard, newShots, shipName)
       ) {
-        setSunkComputerShips((prev) => [...prev, shipName]);
+        const updatedSunkShips = [...sunkComputerShips, shipName];
+        setSunkComputerShips(updatedSunkShips);
         setMessage(`¡Hundiste el ${shipName.split("-")[0]} del computador!`);
         setTimeout(() => {
           setMessage("");
         }, 2000);
+
+        if (updatedSunkShips.length === totalComputerShips) {
+          setMessageWinner("Hundiste todos los barcos del Computador.");
+          launchConfetti();
+          setGameOver(true);
+          setTimeout(() => {
+            setMessageWinner("");
+          }, 4000);
+          return;
+        }
       }
     }
 
@@ -190,12 +152,22 @@ const GameBattleShip = () => {
         !sunkPlayerShips.includes(shipName) &&
         checkIfShipSunk(playerBoard, newShots, shipName)
       ) {
-        setSunkPlayerShips((prev) => [...prev, shipName]);
-
+        const updatedSunkShips = [...sunkPlayerShips, shipName];
+        setSunkPlayerShips(updatedSunkShips);
         setMessage(`¡El computador hundió tu ${shipName.split("-")[0]}!`);
         setTimeout(() => {
           setMessage("");
         }, 2000);
+
+        if (updatedSunkShips.length === totalPlayerShips) {
+          setMessageWinner("El Computador hundió todos tus barcos.");
+          setGameOver(true);
+          setTimeout(() => {
+            setMessageWinner("");
+          }, 4000);
+
+          return;
+        }
       }
     }
 
@@ -211,21 +183,24 @@ const GameBattleShip = () => {
 
   const getPlayerCellClass = (x, y) => {
     const shot = computerShots.find((s) => s.x === x && s.y === y);
-    if (!shot) return playerBoard[x][y] ? playerBoard[x][y].toLowerCase() : "";
+    const cell = playerBoard[x][y];
+
+    if (!shot) {
+      return cell ? cell.split("-")[0].toLowerCase() : "";
+    }
 
     return shot.result === "hit" ? "cell-hit" : "cell-miss";
   };
-
   const checkIfShipSunk = (board, shots, shipName) => {
-    let positions = [];
+    const positions = [];
 
-    for (let x = 0; x < board.length; x++) {
-      for (let y = 0; y < board[x].length; y++) {
-        if (board[x][y] === shipName) {
+    board.forEach((row, x) => {
+      row.forEach((cell, y) => {
+        if (cell === shipName) {
           positions.push({ x, y });
         }
-      }
-    }
+      });
+    });
 
     return positions.every((pos) =>
       shots.some(
@@ -316,13 +291,11 @@ const GameBattleShip = () => {
 
         <div className="box-buttons">
           <Link className="link" to="/settings-game">
-            <button className="button-back-setting">
-              {isMobile ? "Volver" : "Volver a configurar"}
-            </button>
+            <button className="button-back-setting">Volver a configurar</button>
           </Link>
           <Link className="link">
             <button className="button-reset" onClick={resetGame}>
-              {isMobile ? "Reiniciar" : "Reiniciar Juego"}
+              Reiniciar Juego
             </button>
           </Link>
         </div>

@@ -490,7 +490,7 @@ input[type="radio"] {
 }
 
 .cell-hit {
-  background-color: #1a1a1a !important;
+  background-color: #1a1a1a;
   background-image: url("/icons/explosion1.gif");
   background-size: cover;
   background-repeat: no-repeat;
@@ -498,7 +498,7 @@ input[type="radio"] {
 }
 
 .cell-hit:hover {
-  background-color: #1a1a1a !important;
+  background-color: #1a1a1a;
   background-image: url("/icons/explosion1.gif");
   background-size: cover;
   background-repeat: no-repeat;
@@ -601,9 +601,9 @@ Teléfonos pequeños
 
   .button-reset,
   .button-back-setting {
-    font-size: 9px;
-    width: 70px;
-    height: 0px;
+    font-size: 10px;
+    width: 100px;
+    height: 40px;
   }
 
   .title-vs {
