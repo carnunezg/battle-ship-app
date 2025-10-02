@@ -85,6 +85,7 @@ const GameBattleShip = () => {
     setGameOver(false);
     setTurn("player");
     setMessage("");
+    setMessageWinner("");
   };
 
   const handleCellClick = (x, y) => {
@@ -117,9 +118,6 @@ const GameBattleShip = () => {
           setMessageWinner("Hundiste todos los barcos del Computador.");
           launchConfetti();
           setGameOver(true);
-          setTimeout(() => {
-            setMessageWinner("");
-          }, 4000);
           return;
         }
       }
@@ -162,10 +160,6 @@ const GameBattleShip = () => {
         if (updatedSunkShips.length === totalPlayerShips) {
           setMessageWinner("El Computador hundió todos tus barcos.");
           setGameOver(true);
-          setTimeout(() => {
-            setMessageWinner("");
-          }, 4000);
-
           return;
         }
       }
