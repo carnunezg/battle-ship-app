@@ -44,6 +44,40 @@
   }
 }
 
+.message-player {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #29f705da;
+  font-weight: bold;
+  background: #111111;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  z-index: 1000;
+  text-align: center;
+  animation: slideInCenter 0.5s ease-out forwards;
+}
+
+.message-computer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff2727;
+  font-weight: bold;
+  background: #111111;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 25px #29f705da;
+  z-index: 1000;
+  text-align: center;
+  animation: slideInCenter 0.5s ease-out forwards;
+}
+
 .message-warning {
   position: fixed;
   top: 50%;
@@ -62,10 +96,6 @@
 }
 
 .message-winner {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   color: #29f705da;
   font-weight: bold;
   background: rgba(33, 33, 33, 0.9);
@@ -73,18 +103,12 @@
   border-radius: 8px;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
-  z-index: 1000;
   text-align: center;
-  width: 500px;
-  height: 150px;
-  font-size: 20px;
+  width: 380px;
+  height: 110px;
 }
 
 .message-game-over {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   color: #ff2727;
   font-weight: bold;
   background: rgba(33, 33, 33, 0.9);
@@ -92,11 +116,9 @@
   border-radius: 8px;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
-  z-index: 1000;
   text-align: center;
-  width: 500px;
-  height: 150px;
-  font-size: 20px;
+  width: 380px;
+  height: 110px;
 }
 
 .container-form-boars {
@@ -552,22 +574,18 @@ Teléfonos pequeños
     margin-bottom: 10px;
   }
 
-  .message-warning {
+  .message-warning,
+  .message-player,
+  .message-computer {
     font-size: 12px;
     width: 200px;
   }
 
-  .message-winner {
-    width: 250px;
-    height: 90px;
-    font-size: 12px;
-    padding: 8px;
-  }
-
+  .message-winner,
   .message-game-over {
-    width: 400px;
-    height: 130px;
-    font-size: 18px;
+    width: 220px;
+    height: 80px;
+    font-size: 11px;
   }
 
   .card-info-player,
@@ -728,21 +746,18 @@ Tablets y pantallas medianas
     margin-bottom: 10px;
   }
 
-  .message-warning {
+  .message-warning,
+  .message-player,
+  .message-computer {
     font-size: 16px;
     width: 400px;
   }
 
-  .message-winner {
-    width: 400px;
-    height: 130px;
-    font-size: 18px;
-  }
-
+  .message-winner,
   .message-game-over {
-    width: 400px;
-    height: 130px;
-    font-size: 18px;
+    width: 350px;
+    height: 100px;
+    font-size: 15px;
   }
 
   .card-info-player,

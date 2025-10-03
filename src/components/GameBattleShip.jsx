@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { PlayerContext } from "../context/PlayerContext";
 import { ships } from "../utils/consts";
 import { createEmptyBoard } from "../utils/createEmptyBoard";
-import { launchConfetti } from "../utils/launchConfetti";
 
 const GameBattleShip = () => {
   const { player, playerBoard } = useContext(PlayerContext);
@@ -13,6 +12,8 @@ const GameBattleShip = () => {
   const [turn, setTurn] = useState("player");
   const [computerShots, setComputerShots] = useState([]);
   const [message, setMessage] = useState("");
+  const [messagePlayer, setMessagePlayer] = useState("");
+  const [messageComputer, setMessageComputer] = useState("");
   const [sunkPlayerShips, setSunkPlayerShips] = useState([]);
   const [sunkComputerShips, setSunkComputerShips] = useState([]);
   const [gameOver, setGameOver] = useState(false);
@@ -109,14 +110,15 @@ const GameBattleShip = () => {
       ) {
         const updatedSunkShips = [...sunkComputerShips, shipName];
         setSunkComputerShips(updatedSunkShips);
-        setMessage(`¡Hundiste el ${shipName.split("-")[0]} del computador!`);
+        setMessagePlayer(
+          `¡Hundiste el ${shipName.split("-")[0]} del computador!`
+        );
         setTimeout(() => {
-          setMessage("");
+          setMessagePlayer("");
         }, 2000);
 
         if (updatedSunkShips.length === totalComputerShips) {
           setMessageWinner("Hundiste todos los barcos del Computador.");
-          launchConfetti();
           setGameOver(true);
           return;
         }
@@ -152,9 +154,11 @@ const GameBattleShip = () => {
       ) {
         const updatedSunkShips = [...sunkPlayerShips, shipName];
         setSunkPlayerShips(updatedSunkShips);
-        setMessage(`¡El computador hundió tu ${shipName.split("-")[0]}!`);
+        setMessageComputer(
+          `¡El computador hundió tu ${shipName.split("-")[0]}!`
+        );
         setTimeout(() => {
-          setMessage("");
+          setMessageComputer("");
         }, 2000);
 
         if (updatedSunkShips.length === totalPlayerShips) {
@@ -206,50 +210,63 @@ const GameBattleShip = () => {
   return (
     <main className="background-animated">
       <section className="modal">
-        {message && (
-          <div className="message-warning">
-            <p>{message}</p>
+        {messagePlayer && (
+          <div className="message-player">
+            <p>{messagePlayer}</p>
           </div>
         )}
 
-        {messageWinner && (
-          <div
-            className={
-              sunkComputerShips.length === totalComputerShips
-                ? "message-winner"
-                : "message-game-over"
-            }
-          >
-            <h2>
-              {sunkComputerShips.length === totalComputerShips
-                ? "¡GANASTE!"
-                : "¡PERDISTE!"}
-            </h2>
-            <p>{messageWinner}</p>
+        {messageComputer && (
+          <div className="message-computer">
+            <p>{messageComputer}</p>
           </div>
         )}
-
         <section className="container-info">
-          <div className="card-info-player">
-            <h3 className="date-info">
-              Jugador:{" "}
-              <span className="name-player">{player || "Jugador"}</span>
-            </h3>
-            <p className="date-info">
-              Destruidos:
-              <span className="name-player"> {sunkPlayerShips.length}/6</span>
-            </p>
-          </div>
+          {gameOver ? (
+            <div
+              className={
+                sunkComputerShips.length === totalComputerShips
+                  ? "message-winner"
+                  : "message-game-over"
+              }
+            >
+              <h2>
+                {sunkComputerShips.length === totalComputerShips
+                  ? "¡GANASTE!"
+                  : "¡PERDISTE!"}
+              </h2>
+              <p>{messageWinner}</p>
+            </div>
+          ) : (
+            <>
+              <div className="card-info-player">
+                <h3 className="date-info">
+                  Jugador:{" "}
+                  <span className="name-player">{player || "Jugador"}</span>
+                </h3>
+                <p className="date-info">
+                  Destruidos:
+                  <span className="name-player">
+                    {" "}
+                    {sunkPlayerShips.length}/6
+                  </span>
+                </p>
+              </div>
 
-          <div className="card-info-pc">
-            <h3 className="date-info">
-              Jugador: <span className="name-player"> Computador</span>
-            </h3>
-            <p className="date-info">
-              Destruidos:
-              <span className="name-player"> {sunkComputerShips.length}/6</span>
-            </p>
-          </div>
+              <div className="card-info-pc">
+                <h3 className="date-info">
+                  Jugador: <span className="name-player"> Computador</span>
+                </h3>
+                <p className="date-info">
+                  Destruidos:
+                  <span className="name-player">
+                    {" "}
+                    {sunkComputerShips.length}/6
+                  </span>
+                </p>
+              </div>
+            </>
+          )}
         </section>
 
         <div className="container-form-boars">
