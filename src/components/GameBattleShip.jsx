@@ -118,8 +118,12 @@ const GameBattleShip = () => {
         }, 2000);
 
         if (updatedSunkShips.length === totalComputerShips) {
-          setMessageWinner("Hundiste todos los barcos del Computador.");
-          setGameOver(true);
+          setTimeout(() => {
+            setMessage("¡GANASTE!");
+            setMessageWinner("Hundiste todos los barcos del Computador.");
+            setGameOver(true);
+          }, 2000);
+
           return;
         }
       }
@@ -162,8 +166,12 @@ const GameBattleShip = () => {
         }, 2000);
 
         if (updatedSunkShips.length === totalPlayerShips) {
-          setMessageWinner("El Computador hundió todos tus barcos.");
-          setGameOver(true);
+          setTimeout(() => {
+            setMessage("¡PERDISTE!");
+            setMessageWinner("El Computador hundió todos tus barcos.");
+            setGameOver(true);
+          }, 2000);
+
           return;
         }
       }
@@ -207,6 +215,20 @@ const GameBattleShip = () => {
     );
   };
 
+  const getShipSummary = (sunkShips, shipList) => {
+    const summary = {};
+
+    shipList.forEach((ship) => {
+      const total = ship.count;
+      const sunk = Array.from({ length: total }).filter((_, i) =>
+        sunkShips.includes(`${ship.name}-${i + 1}`)
+      ).length;
+
+      summary[ship.name] = { sunk, total };
+    });
+
+    return summary;
+  };
   return (
     <main className="background-animated">
       <section className="modal">
@@ -230,40 +252,61 @@ const GameBattleShip = () => {
                   : "message-game-over"
               }
             >
-              <h2>
-                {sunkComputerShips.length === totalComputerShips
-                  ? "¡GANASTE!"
-                  : "¡PERDISTE!"}
-              </h2>
+              <h2>{message}</h2>
               <p>{messageWinner}</p>
             </div>
           ) : (
             <>
               <div className="card-info-player">
-                <h3 className="date-info">
-                  Jugador:{" "}
-                  <span className="name-player">{player || "Jugador"}</span>
-                </h3>
-                <p className="date-info">
-                  Destruidos:
-                  <span className="name-player">
-                    {" "}
-                    {sunkPlayerShips.length}/6
-                  </span>
-                </p>
+                <h3 className="date-info">{player || "Jugador"}</h3>
+
+                <div className="ship-summary">
+                  {Object.entries(getShipSummary(sunkPlayerShips, ships)).map(
+                    ([name, { sunk, total }]) => (
+                      <p
+                        key={name}
+                        className={`ship-summary-item ${
+                          sunk === total ? "sunk" : ""
+                        }`}
+                      >
+                        {name}{" "}
+                        <span
+                          className={`ship-info ${
+                            sunk === total ? "ship-info-sunk" : ""
+                          }`}
+                        >
+                          {sunk}/{total}
+                        </span>
+                      </p>
+                    )
+                  )}
+                </div>
               </div>
 
               <div className="card-info-pc">
-                <h3 className="date-info">
-                  Jugador: <span className="name-player"> Computador</span>
-                </h3>
-                <p className="date-info">
-                  Destruidos:
-                  <span className="name-player">
-                    {" "}
-                    {sunkComputerShips.length}/6
-                  </span>
-                </p>
+                <h3 className="date-info">Computador</h3>
+
+                <div className="ship-summary">
+                  {Object.entries(getShipSummary(sunkComputerShips, ships)).map(
+                    ([name, { sunk, total }]) => (
+                      <p
+                        key={name}
+                        className={`ship-summary-item ${
+                          sunk === total ? "sunk" : ""
+                        }`}
+                      >
+                        {name}{" "}
+                        <span
+                          className={`ship-info ${
+                            sunk === total ? "ship-info-sunk" : ""
+                          }`}
+                        >
+                          {sunk}/{total}
+                        </span>
+                      </p>
+                    )
+                  )}
+                </div>
               </div>
             </>
           )}

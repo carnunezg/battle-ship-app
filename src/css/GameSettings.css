@@ -71,8 +71,8 @@
   background: #111111;
   padding: 10px 20px;
   border-radius: 8px;
-  border: 2px solid #29f705da;
-  box-shadow: 0 0 25px #29f705da;
+  border: 2px solid #ff2727;
+  box-shadow: 0 0 25px #ff2727;
   z-index: 1000;
   text-align: center;
   animation: slideInCenter 0.5s ease-out forwards;
@@ -95,6 +95,26 @@
   animation: slideInCenter 0.5s ease-out forwards;
 }
 
+@keyframes pulse-green {
+  0%,
+  100% {
+    box-shadow: 0 0 15px #29f705da;
+  }
+  50% {
+    box-shadow: 0 0 25px #29f705da;
+  }
+}
+
+@keyframes pulse-red {
+  0%,
+  100% {
+    box-shadow: 0 0 15px #ff2727;
+  }
+  50% {
+    box-shadow: 0 0 25px #ff2727;
+  }
+}
+
 .message-winner {
   color: #29f705da;
   font-weight: bold;
@@ -106,6 +126,7 @@
   text-align: center;
   width: 380px;
   height: 110px;
+  animation: pulse-green 1.5s infinite;
 }
 
 .message-game-over {
@@ -114,11 +135,12 @@
   background: rgba(33, 33, 33, 0.9);
   padding: 10px 20px;
   border-radius: 8px;
-  border: 2px solid #29f705da;
-  box-shadow: 0 0 25px #29f705da;
+  border: 2px solid #ff2727;
+  box-shadow: 0 0 25px #ff2727;
   text-align: center;
   width: 380px;
   height: 110px;
+  animation: pulse-red 1.5s infinite;
 }
 
 .container-form-boars {
@@ -211,32 +233,58 @@
 
 .card-info-player {
   background: rgba(26, 26, 26, 0.7);
-  padding: 30px 40px;
+  padding: 40px 40px;
   border-radius: 12px;
   color: white;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: center;
   justify-content: center;
   width: 290px;
-  height: 20px;
+  height: 30px;
 }
 
 .card-info-pc {
   background: rgba(26, 26, 26, 0.7);
-  padding: 30px 40px;
+  padding: 40px 40px;
   border-radius: 12px;
   color: white;
   border: 2px solid #29f705da;
   box-shadow: 0 0 25px #29f705da;
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: center;
   justify-content: center;
   width: 290px;
-  height: 20px;
+  height: 30px;
+}
+
+.ship-summary {
+  display: flex;
+  gap: 8px;
+}
+
+.ship-summary-item {
+  font-weight: bold;
+  text-align: center;
+  padding: 6px;
+  font-size: 12px;
+}
+
+.ship-summary-item.sunk {
+  color: red;
+  text-decoration: line-through;
+}
+
+.ship-info {
+  color: #29f705da;
+}
+
+.ship-info-sunk {
+  color: #ff2727;
+  text-decoration: line-through;
 }
 
 .board-grid {
@@ -304,7 +352,7 @@
   color: #fff;
   text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
   padding: 0;
-  margin: 0;
+  margin-bottom: 0px;
 }
 
 .title-vs {
@@ -583,22 +631,36 @@ Teléfonos pequeños
 
   .message-winner,
   .message-game-over {
-    width: 220px;
-    height: 80px;
-    font-size: 11px;
+    width: 200px;
+    height: 40px;
+    font-size: 9px;
   }
 
   .card-info-player,
   .card-info-pc {
     display: flex;
     flex-direction: column;
-    align-items: start;
     width: 50px;
     height: 0;
+    padding: 25px 50px;
+  }
+
+  .ship-summary {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .ship-summary-item {
+    font-weight: normal;
+    text-align: center;
+    padding: 0px;
+    margin: 0;
+    font-size: 6px;
   }
 
   .date-info {
-    font-size: 8px;
+    font-size: 11px;
     color: #29f705da;
     padding: 0;
     margin: 0;
@@ -611,6 +673,10 @@ Teléfonos pequeños
     margin: 0;
   }
 
+  h2 {
+    margin: 0;
+  }
+
   .container-info {
     display: flex;
     gap: 2px;
@@ -619,9 +685,9 @@ Teléfonos pequeños
 
   .button-reset,
   .button-back-setting {
-    font-size: 10px;
-    width: 100px;
-    height: 40px;
+    font-size: 9px;
+    width: 90px;
+    height: 30px;
   }
 
   .title-vs {

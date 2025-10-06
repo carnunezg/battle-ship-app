@@ -21,7 +21,7 @@ const GameSettings = () => {
 
   const handleCellClick = (x, y) => {
     if (!selectedShip) {
-      setMessage("Debes seleccionar un barco antes de colocar.");
+      setMessage("Debes seleccionar un barco.");
       setTimeout(() => setMessage(""), 3000);
       return;
     }
