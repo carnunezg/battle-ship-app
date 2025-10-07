@@ -34,7 +34,7 @@ const GameBattleShip = () => {
     if (turn === "computer") {
       setTimeout(() => {
         computerShoot();
-      }, 500);
+      }, 1000);
     }
   }, [turn]);
 
@@ -257,7 +257,11 @@ const GameBattleShip = () => {
             </div>
           ) : (
             <>
-              <div className="card-info-player">
+              <div
+                className={`card-info-player ${
+                  turn === "player" ? "card-turn" : ""
+                }`}
+              >
                 <h3 className="date-info">{player || "Jugador"}</h3>
 
                 <div className="ship-summary">
@@ -283,7 +287,11 @@ const GameBattleShip = () => {
                 </div>
               </div>
 
-              <div className="card-info-pc">
+              <div
+                className={`card-info-pc ${
+                  turn === "computer" ? "card-turn" : ""
+                }`}
+              >
                 <h3 className="date-info">Computador</h3>
 
                 <div className="ship-summary">

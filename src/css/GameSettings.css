@@ -55,7 +55,7 @@
   padding: 10px 20px;
   border-radius: 8px;
   border: 2px solid #29f705da;
-  box-shadow: 0 0 25px #29f705da;
+  box-shadow: 0 0 600px #29f705da;
   z-index: 1000;
   text-align: center;
   animation: slideInCenter 0.5s ease-out forwards;
@@ -72,7 +72,7 @@
   padding: 10px 20px;
   border-radius: 8px;
   border: 2px solid #ff2727;
-  box-shadow: 0 0 25px #ff2727;
+  box-shadow: 0 0 600px #ff2727;
   z-index: 1000;
   text-align: center;
   animation: slideInCenter 0.5s ease-out forwards;
@@ -236,8 +236,7 @@
   padding: 40px 40px;
   border-radius: 12px;
   color: white;
-  border: 2px solid #29f705da;
-  box-shadow: 0 0 25px #29f705da;
+  border: 2px solid #1a1a1a;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -251,14 +250,20 @@
   padding: 40px 40px;
   border-radius: 12px;
   color: white;
-  border: 2px solid #29f705da;
-  box-shadow: 0 0 25px #29f705da;
+  border: 2px solid #1a1a1a;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 290px;
   height: 30px;
+}
+
+.card-turn {
+  border: 2px solid #29f705da;
+  box-shadow: 0 0 40px #29f705da;
+  transition: transform 0.5s ease, color 0.5s ease;
+  transform: scale(1.05);
 }
 
 .ship-summary {
@@ -625,8 +630,8 @@ Teléfonos pequeños
   .message-warning,
   .message-player,
   .message-computer {
-    font-size: 12px;
-    width: 200px;
+    font-size: 11px;
+    width: 220px;
   }
 
   .message-winner,
@@ -643,6 +648,7 @@ Teléfonos pequeños
     width: 50px;
     height: 0;
     padding: 25px 50px;
+    margin-inline: 3px;
   }
 
   .ship-summary {
