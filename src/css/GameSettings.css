@@ -191,7 +191,19 @@
   background-color: #a29b9b;
   border: 2px solid #b9acac;
   cursor: not-allowed;
-  color: #545252;
+  color: #1a1a1a;
+}
+
+.board-cell.disabled {
+  background-color: #a29b9b;
+  border: 1px solid #b9acac;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.board-cell.disabled:hover {
+  background-color: #a29b9b;
+  cursor: not-allowed;
 }
 
 .card {

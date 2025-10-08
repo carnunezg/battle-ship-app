@@ -12,6 +12,7 @@ const GameSettings = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
+  const isNameEntered = name.trim() !== "";
   const [localBoard, setLocalBoard] = useState(createEmptyBoard());
 
   const [selectedShip, setSelectedShip] = useState(null);
@@ -161,7 +162,7 @@ const GameSettings = () => {
                             selectedShip?.name === ship.name ? "selected" : ""
                           }`}
                           key={ship.name}
-                          disabled={remaining === 0}
+                          disabled={remaining === 0 || !isNameEntered}
                           onClick={(e) => handleShipSelect(e, ship)}
                         >
                           {ship.name} <br /> ({ship.size} celdas) <br />{" "}
@@ -179,10 +180,10 @@ const GameSettings = () => {
                 row.map((cell, y) => (
                   <div
                     key={`${x}-${y}`}
-                    onClick={() => handleCellClick(x, y)}
+                    onClick={() => isNameEntered && handleCellClick(x, y)}
                     className={`board-cell ${
                       cell ? cell.split("-")[0].toLowerCase() : ""
-                    }`}
+                    } ${!isNameEntered ? "disabled" : ""}`}
                   />
                 ))
               )}
