@@ -191,14 +191,20 @@ const GameSettings = () => {
           </div>
 
           <section className="box-buttons">
-            <Link className="link">
-              <button className="button-back" onClick={reset}>
-                Restablecer
-              </button>
-            </Link>
+            {name.trim() !== "" && (
+              <Link className="link">
+                <button className="button-back" onClick={reset}>
+                  Restablecer
+                </button>
+              </Link>
+            )}
 
             <Link className="link" to={isReadyToPlay ? "/game" : "#"}>
-              <button className="button-start" onClick={handleStartClick}>
+              <button
+                className={`button-start ${!isReadyToPlay ? "disabled" : ""}`}
+                onClick={handleStartClick}
+                disabled={!isReadyToPlay}
+              >
                 Comenzar
               </button>
             </Link>
