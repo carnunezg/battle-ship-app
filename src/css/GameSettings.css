@@ -589,15 +589,16 @@ input[type="radio"] {
 }
 
 .cell-hit {
-  background-color: #1a1a1a;
+  background-color: #5c1824;
   background-image: url("/icons/explosion1.gif");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  border: 1px solid #5c1824;
 }
 
 .cell-hit:hover {
-  background-color: #1a1a1a;
+  background-color: #5c1824;
   background-image: url("/icons/explosion1.gif");
   background-size: cover;
   background-repeat: no-repeat;
@@ -610,6 +611,7 @@ input[type="radio"] {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  border: 1px solid #3b13ce2c;
 }
 
 .cell-miss:hover {

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import "../css/GameSettings.css";
-import { useState } from "react";
-import { useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { PlayerContext } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
 import { ships } from "../utils/consts";
@@ -20,21 +19,48 @@ const GameSettings = () => {
   const [placedShips, setPlacedShips] = useState({});
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (isNameEntered && !selectedShip) {
+      const nextShip = orderedShips.find(
+        (ship) => (placedShips[ship.name] || 0) < ship.count
+      );
+      if (nextShip) {
+        setSelectedShip(nextShip);
+      }
+    }
+  }, [name, placedShips, selectedShip]);
+
+  useEffect(() => {
+    if (name.trim() === "") {
+      reset();
+    }
+  }, [name]);
+
+  const orderedShips = [...ships].sort((a, b) => b.size - a.size);
+
+  const getNextShipToPlace = () => {
+    let next = null;
+    orderedShips.forEach((ship) => {
+      const placed = placedShips[ship.name] || 0;
+      if (next === null && placed < ship.count) {
+        next = ship.name;
+      }
+    });
+    return next;
+  };
+
   const handleCellClick = (x, y) => {
-    if (!selectedShip) {
-      setMessage("Debes seleccionar un barco.");
+    const allShipsPlaced = ships.every(
+      (ship) => (placedShips[ship.name] || 0) === ship.count
+    );
+
+    if (allShipsPlaced) {
+      setMessage("Ya colocaste todos los barcos.");
       setTimeout(() => setMessage(""), 3000);
       return;
     }
 
     const currentCount = placedShips[selectedShip.name] || 0;
-    if (currentCount >= selectedShip.count) {
-      setMessage(`Ya colocaste todos los "${selectedShip.name}".`);
-      setTimeout(() => {
-        setMessage("");
-      }, 3000);
-      return;
-    }
 
     const newBoard = localBoard.map((row) => [...row]);
     const size = selectedShip.size;
@@ -64,10 +90,33 @@ const GameSettings = () => {
     });
 
     setLocalBoard(newBoard);
-    setPlacedShips((prev) => ({
-      ...prev,
-      [selectedShip.name]: currentCount + 1,
-    }));
+    setPlacedShips((prev) => {
+      const updated = {
+        ...prev,
+        [selectedShip.name]: currentCount + 1,
+      };
+
+      const remaining = selectedShip.count - (updated[selectedShip.name] || 0);
+      if (remaining === 0) {
+        let nextShip = null;
+        orderedShips.forEach((ship) => {
+          const placed = updated[ship.name] || 0;
+          if (!nextShip && placed < ship.count) {
+            nextShip = ship;
+          }
+        });
+
+        if (nextShip) {
+          setSelectedShip(nextShip);
+        } else {
+          setSelectedShip(null);
+          setMessage("Ya colocaste todos los barcos.");
+          setTimeout(() => setMessage(""), 3000);
+        }
+      }
+
+      return updated;
+    });
   };
 
   const reset = () => {
@@ -79,26 +128,18 @@ const GameSettings = () => {
     setPlayerBoard([]);
   };
 
-  const handleShipSelect = (e, ship) => {
-    e.preventDefault();
+  const handleShipSelect = (ship) => {
     setSelectedShip(ship);
-    setMessage("");
   };
 
   const isReadyToPlay =
     name.trim() !== "" &&
     ships.every((ship) => (placedShips[ship.name] || 0) === ship.count);
 
-  const handleStartClick = (e) => {
-    if (!isReadyToPlay) {
-      e.preventDefault();
-      setMessage("Debes ingresar tu nombre y colocar todos los barcos.");
-      setTimeout(() => setMessage(""), 3000);
-    } else {
-      setPlayer(name);
-      setPlayerBoard(localBoard);
-      navigate("/game");
-    }
+  const handleStartClick = () => {
+    setPlayer(name);
+    setPlayerBoard(localBoard);
+    navigate("/game");
   };
 
   return (
@@ -115,7 +156,7 @@ const GameSettings = () => {
           <div className="container-form-boars">
             <div className="card">
               <div className="container-title">
-                <label className="title-h3 ">Configura tus barcos</label>
+                <label className="title-h3">Configura tus barcos</label>
               </div>
 
               <form className="container-form">
@@ -153,19 +194,22 @@ const GameSettings = () => {
 
                 <div>
                   <section className="container-buttons">
-                    {ships.map((ship) => {
+                    {orderedShips.map((ship) => {
                       const remaining =
                         ship.count - (placedShips[ship.name] || 0);
+                      const nextShip = getNextShipToPlace();
+                      const isEnabled = isNameEntered && ship.name === nextShip;
+
                       return (
                         <button
                           className={`button-ship ${
                             selectedShip?.name === ship.name ? "selected" : ""
                           }`}
                           key={ship.name}
-                          disabled={remaining === 0 || !isNameEntered}
+                          disabled={!isEnabled}
                           onClick={(e) => handleShipSelect(e, ship)}
                         >
-                          {ship.name} <br /> ({ship.size} celdas) <br />{" "}
+                          {ship.name} <br /> ({ship.size} celdas) <br />
                           Cantidad: {remaining}
                         </button>
                       );

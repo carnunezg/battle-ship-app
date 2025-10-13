@@ -18,6 +18,12 @@ const GameBattleShip = () => {
   const [sunkComputerShips, setSunkComputerShips] = useState([]);
   const [gameOver, setGameOver] = useState(false);
   const [messageWinner, setMessageWinner] = useState("");
+  const [targetMode, setTargetMode] = useState(false);
+  const [targetHits, setTargetHits] = useState([]);
+  const [targetQueue, setTargetQueue] = useState([]);
+  const [targetDirection, setTargetDirection] = useState(null);
+
+  const hasPlayerShot = shots.length > 0;
 
   const totalComputerShips = ships.reduce((acc, ship) => acc + ship.count, 0);
   const totalPlayerShips = ships.reduce((acc, ship) => acc + ship.count, 0);
@@ -52,7 +58,6 @@ const GameBattleShip = () => {
         let canPlace = true;
         const positions = [];
 
-        // Validar posiciones
         Array.from({ length: ship.size }).forEach((_, i) => {
           const xi = orientation === "vertical" ? x + i : x;
           const yi = orientation === "horizontal" ? y + i : y;
@@ -64,7 +69,28 @@ const GameBattleShip = () => {
           }
         });
 
-        // Colocar barco si es válido
+        if (canPlace) {
+          positions.forEach(({ xi, yi }) => {
+            Array.from({ length: 3 }).forEach((_, dx) => {
+              Array.from({ length: 3 }).forEach((_, dy) => {
+                const nx = xi + dx - 1;
+                const ny = yi + dy - 1;
+
+                if (
+                  nx >= 0 &&
+                  nx < 10 &&
+                  ny >= 0 &&
+                  ny < 10 &&
+                  board[nx][ny] &&
+                  !positions.some((pos) => pos.xi === nx && pos.yi === ny)
+                ) {
+                  canPlace = false;
+                }
+              });
+            });
+          });
+        }
+
         if (canPlace) {
           positions.forEach(({ xi, yi }) => {
             board[xi][yi] = `${ship.name}-${placed + 1}`;
@@ -135,13 +161,117 @@ const GameBattleShip = () => {
   const computerShoot = () => {
     if (gameOver) return;
 
-    let x, y, alreadyShot;
+    let x, y;
 
-    do {
-      x = Math.floor(Math.random() * 10);
-      y = Math.floor(Math.random() * 10);
-      alreadyShot = computerShots.find((s) => s.x === x && s.y === y);
-    } while (alreadyShot);
+    const isSurroundedByShots = (x, y) => {
+      const directions = [
+        { dx: -1, dy: 0 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: -1 },
+        { dx: 0, dy: 1 },
+      ];
+
+      return directions.every(({ dx, dy }) => {
+        const nx = x + dx;
+        const ny = y + dy;
+        return (
+          nx < 0 ||
+          nx >= 10 ||
+          ny < 0 ||
+          ny >= 10 ||
+          computerShots.find((s) => s.x === nx && s.y === ny)
+        );
+      });
+    };
+
+    const getNextTarget = () => {
+      if (targetDirection && targetHits.length >= 2) {
+        const sortedHits = [...targetHits].sort((a, b) => {
+          if (targetDirection === "up" || targetDirection === "down") {
+            return a.x - b.x;
+          } else {
+            return a.y - b.y;
+          }
+        });
+
+        const forward = targetDirection;
+        const backward = {
+          up: "down",
+          down: "up",
+          left: "right",
+          right: "left",
+        }[targetDirection];
+
+        const getNextInDirection = (from, direction) => {
+          let nx = from.x;
+          let ny = from.y;
+
+          if (direction === "up") nx -= 1;
+          if (direction === "down") nx += 1;
+          if (direction === "left") ny -= 1;
+          if (direction === "right") ny += 1;
+
+          const alreadyShot = computerShots.find(
+            (s) => s.x === nx && s.y === ny
+          );
+
+          if (nx >= 0 && nx < 10 && ny >= 0 && ny < 10 && !alreadyShot) {
+            return { x: nx, y: ny };
+          }
+
+          return null;
+        };
+
+        const nextForward = getNextInDirection(
+          sortedHits[sortedHits.length - 1],
+          forward
+        );
+        if (nextForward) return nextForward;
+
+        const nextBackward = getNextInDirection(sortedHits[0], backward);
+        if (nextBackward) return nextBackward;
+
+        setTargetDirection(null);
+      }
+
+      while (targetQueue.length > 0) {
+        const [next, ...rest] = targetQueue;
+        setTargetQueue(rest);
+
+        const alreadyShot = computerShots.find(
+          (s) => s.x === next.x && s.y === next.y
+        );
+
+        if (
+          next.x >= 0 &&
+          next.x < 10 &&
+          next.y >= 0 &&
+          next.y < 10 &&
+          !alreadyShot
+        ) {
+          return next;
+        }
+      }
+
+      setTargetMode(false);
+      setTargetHits([]);
+      setTargetDirection(null);
+      return null;
+    };
+    const nextTarget = targetMode ? getNextTarget() : null;
+
+    if (nextTarget) {
+      x = nextTarget.x;
+      y = nextTarget.y;
+    } else {
+      do {
+        x = Math.floor(Math.random() * 10);
+        y = Math.floor(Math.random() * 10);
+      } while (
+        computerShots.find((s) => s.x === x && s.y === y) ||
+        isSurroundedByShots(x, y)
+      );
+    }
 
     const cell = playerBoard[x][y];
     const result = cell ? "hit" : "miss";
@@ -152,6 +282,52 @@ const GameBattleShip = () => {
     if (result === "hit") {
       const shipName = cell;
 
+      const updatedHits = [...targetHits, { x, y }];
+      setTargetHits(updatedHits);
+      setTargetMode(true);
+
+      if (updatedHits.length >= 2 && !targetDirection) {
+        const [first, second] = updatedHits;
+        if (first.x === second.x) {
+          setTargetDirection("right");
+        } else if (first.y === second.y) {
+          setTargetDirection("down");
+        }
+      }
+
+      if (
+        !sunkPlayerShips.includes(shipName) &&
+        !checkIfShipSunk(playerBoard, newShots, shipName)
+      ) {
+        if (!targetDirection) {
+          const directions = [
+            { dx: -1, dy: 0 },
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: -1 },
+            { dx: 0, dy: 1 },
+          ];
+
+          const newTargets = [];
+          directions.forEach(({ dx, dy }) => {
+            const nx = x + dx;
+            const ny = y + dy;
+            if (
+              nx >= 0 &&
+              nx < 10 &&
+              ny >= 0 &&
+              ny < 10 &&
+              !computerShots.find((s) => s.x === nx && s.y === ny)
+            ) {
+              newTargets.push({ x: nx, y: ny });
+            }
+          });
+
+          setTargetQueue((prev) => [...prev, ...newTargets]);
+        }
+        setTurn("player");
+        return;
+      }
+
       if (
         !sunkPlayerShips.includes(shipName) &&
         checkIfShipSunk(playerBoard, newShots, shipName)
@@ -161,9 +337,12 @@ const GameBattleShip = () => {
         setMessageComputer(
           `¡El computador hundió tu ${shipName.split("-")[0]}!`
         );
-        setTimeout(() => {
-          setMessageComputer("");
-        }, 2000);
+        setTimeout(() => setMessageComputer(""), 2000);
+
+        setTargetMode(false);
+        setTargetHits([]);
+        setTargetQueue([]);
+        setTargetDirection(null);
 
         if (updatedSunkShips.length === totalPlayerShips) {
           setTimeout(() => {
@@ -171,9 +350,11 @@ const GameBattleShip = () => {
             setMessageWinner("El Computador hundió todos tus barcos.");
             setGameOver(true);
           }, 2000);
-
           return;
         }
+
+        setTurn("player");
+        return;
       }
     }
 
@@ -355,11 +536,14 @@ const GameBattleShip = () => {
           <Link className="link" to="/settings-game">
             <button className="button-back-setting">Volver a configurar</button>
           </Link>
-          <Link className="link">
-            <button className="button-reset" onClick={resetGame}>
-              Reiniciar Juego
-            </button>
-          </Link>
+
+          {hasPlayerShot && (
+            <Link className="link">
+              <button className="button-reset" onClick={resetGame}>
+                Reiniciar Juego
+              </button>
+            </Link>
+          )}
         </div>
       </section>
     </main>
