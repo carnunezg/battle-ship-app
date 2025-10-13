@@ -128,8 +128,10 @@ const GameSettings = () => {
     setPlayerBoard([]);
   };
 
-  const handleShipSelect = (ship) => {
+  const handleShipSelect = (e, ship) => {
+    e.preventDefault();
     setSelectedShip(ship);
+    setMessage("");
   };
 
   const isReadyToPlay =
@@ -177,6 +179,7 @@ const GameSettings = () => {
                       value="horizontal"
                       checked={orientation === "horizontal"}
                       onChange={(e) => setOrientation(e.target.value)}
+                      disabled={!name.trim()}
                     />
                     Horizontal
                   </label>
@@ -187,6 +190,7 @@ const GameSettings = () => {
                       value="vertical"
                       checked={orientation === "vertical"}
                       onChange={(e) => setOrientation(e.target.value)}
+                      disabled={!name.trim()}
                     />
                     Vertical
                   </label>

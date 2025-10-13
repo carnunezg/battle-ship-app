@@ -457,10 +457,21 @@
   text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
 }
 
+.radio-label:has(input:disabled) {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
 input[type="radio"] {
   accent-color: #29f705da;
   margin-right: 5px;
   transform: scale(1.3);
+}
+
+input[type="radio"]:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  filter: grayscale(100%);
 }
 
 .box-buttons {
