@@ -585,6 +585,13 @@ input[type="radio"]:disabled {
   background: #11111131;
 }
 
+.board-cell.preview {
+  background-color: rgba(0, 123, 255, 0.4);
+  border: 1px dashed #007bff;
+  font-weight: bold;
+  text-align: center;
+}
+
 /* Colores para celdas del tablero */
 .board-cell.portaaviones {
   background-color: #2171c1;
@@ -645,6 +652,86 @@ input[type="radio"]:disabled {
   color: #fff;
 }
 
+/* control para las direcciones*/
+
+.direction-selector {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 40px 40px 40px;
+  grid-template-rows: 40px 40px 40px;
+  gap: 4px;
+  transform: translate(-150px, 0px);
+  z-index: 10;
+}
+
+.button-direction {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  background: #2774f7;
+  border: 2px solid #2774f7;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.button-direction:hover {
+  background-color: #306bd2;
+  border: 2px solid #306bd2;
+}
+
+/* Triángulo base (arriba) */
+.arrow-up {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Izquierda */
+.arrow-left {
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+}
+
+/* Derecha */
+.arrow-right {
+  clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+}
+
+/* Abajo */
+.arrow-down {
+  clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+}
+
+.button-ok {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  background: #111111;
+  border: 2px solid #2774f7;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.button-ok:hover {
+  background-color: #1a1a1a;
+}
+
+/* Posiciones del control */
+.direction-selector button:nth-child(1) {
+  grid-area: 1 / 2;
+} /* arriba */
+.direction-selector button:nth-child(2) {
+  grid-area: 2 / 1;
+} /* izquierda */
+.direction-selector button:nth-child(3) {
+  grid-area: 2 / 3;
+} /* derecha */
+.direction-selector button:nth-child(4) {
+  grid-area: 3 / 2;
+} /* abajo */
+.direction-selector button:nth-child(5) {
+  grid-area: 2 / 2;
+} /* Colocar */
+
 /*
 .
 .
@@ -658,6 +745,9 @@ Teléfonos pequeños
 */
 
 @media screen and (max-width: 480px) {
+  .direction-selector {
+    transform: translate(46px, -200px);
+  }
   .card-info {
     width: 15rem;
     height: 0;
@@ -849,6 +939,9 @@ Tablets y pantallas medianas
 */
 
 @media screen and (min-width: 481px) and (max-width: 768px) {
+  .direction-selector {
+    transform: translate(0px, -250px);
+  }
   .card-info {
     width: 38rem;
     height: 0;

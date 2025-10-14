@@ -19,6 +19,12 @@ const GameSettings = () => {
   const [placedShips, setPlacedShips] = useState({});
   const [message, setMessage] = useState("");
 
+  const [previewPosition, setPreviewPosition] = useState(null);
+  const [showDirectionSelector, setShowDirectionSelector] = useState(false);
+  const [previewPositions, setPreviewPositions] = useState([]);
+
+  const orderedShips = [...ships].sort((a, b) => b.size - a.size);
+
   useEffect(() => {
     if (isNameEntered && !selectedShip) {
       const nextShip = orderedShips.find(
@@ -36,8 +42,6 @@ const GameSettings = () => {
     }
   }, [name]);
 
-  const orderedShips = [...ships].sort((a, b) => b.size - a.size);
-
   const getNextShipToPlace = () => {
     let next = null;
     orderedShips.forEach((ship) => {
@@ -49,42 +53,86 @@ const GameSettings = () => {
     return next;
   };
 
-  const handleCellClick = (x, y) => {
-    const allShipsPlaced = ships.every(
-      (ship) => (placedShips[ship.name] || 0) === ship.count
-    );
-
-    if (allShipsPlaced) {
-      setMessage("Ya colocaste todos los barcos.");
-      setTimeout(() => setMessage(""), 3000);
-      return;
-    }
-
-    const currentCount = placedShips[selectedShip.name] || 0;
-
-    const newBoard = localBoard.map((row) => [...row]);
-    const size = selectedShip.size;
-
-    let validPlacement = true;
+  const isValidPlacement = (x, y, direction, size) => {
+    const newBoard = localBoard;
     const positions = [];
 
-    Array.from({ length: size }).forEach((_, i) => {
-      const xi = orientation === "vertical" ? x + i : x;
-      const yi = orientation === "horizontal" ? y + i : y;
+    for (let i = 0; i < size; i++) {
+      let xi = x,
+        yi = y;
 
-      if (xi >= 10 || yi >= 10 || newBoard[xi][yi]) {
-        validPlacement = false;
-      } else {
-        positions.push({ xi, yi });
+      if (direction === "right") yi += i;
+      if (direction === "left") yi -= i;
+      if (direction === "down") xi += i;
+      if (direction === "up") xi -= i;
+
+      if (xi < 0 || xi >= 10 || yi < 0 || yi >= 10 || newBoard[xi][yi]) {
+        return null;
       }
-    });
 
-    if (!validPlacement) {
+      positions.push({ xi, yi });
+    }
+
+    return positions;
+  };
+
+  const handleCellClick = (x, y) => {
+    if (!selectedShip) return;
+
+    const defaultDirection = "right";
+    const positions = isValidPlacement(
+      x,
+      y,
+      defaultDirection,
+      selectedShip.size
+    );
+
+    if (!positions) {
       setMessage("No puedes colocar el barco en esa posición.");
       setTimeout(() => setMessage(""), 3000);
       return;
     }
 
+    setPreviewPosition({ x, y });
+    setOrientation(defaultDirection);
+    setPreviewPositions(positions);
+    setShowDirectionSelector(true);
+  };
+
+  const handleDirectionChange = (dir) => {
+    if (!previewPosition || !selectedShip) return;
+
+    const positions = isValidPlacement(
+      previewPosition.x,
+      previewPosition.y,
+      dir,
+      selectedShip.size
+    );
+
+    if (!positions) {
+      setMessage("No puedes colocar el barco en esa dirección.");
+      setTimeout(() => setMessage(""), 3000);
+      return;
+    }
+
+    setOrientation(dir);
+    setPreviewPositions(positions);
+  };
+
+  const confirmPlacement = () => {
+    if (!previewPosition || !selectedShip) return;
+
+    const currentCount = placedShips[selectedShip.name] || 0;
+    const positions = isValidPlacement(
+      previewPosition.x,
+      previewPosition.y,
+      orientation,
+      selectedShip.size
+    );
+
+    if (!positions) return;
+
+    const newBoard = localBoard.map((row) => [...row]);
     positions.forEach(({ xi, yi }) => {
       newBoard[xi][yi] = `${selectedShip.name}-${currentCount + 1}`;
     });
@@ -98,25 +146,17 @@ const GameSettings = () => {
 
       const remaining = selectedShip.count - (updated[selectedShip.name] || 0);
       if (remaining === 0) {
-        let nextShip = null;
-        orderedShips.forEach((ship) => {
-          const placed = updated[ship.name] || 0;
-          if (!nextShip && placed < ship.count) {
-            nextShip = ship;
-          }
-        });
-
-        if (nextShip) {
-          setSelectedShip(nextShip);
-        } else {
-          setSelectedShip(null);
-          setMessage("Ya colocaste todos los barcos.");
-          setTimeout(() => setMessage(""), 3000);
-        }
+        const nextShip = orderedShips.find(
+          (ship) => (updated[ship.name] || 0) < ship.count
+        );
+        setSelectedShip(nextShip || null);
       }
 
       return updated;
     });
+
+    setShowDirectionSelector(false);
+    setPreviewPosition(null);
   };
 
   const reset = () => {
@@ -126,6 +166,9 @@ const GameSettings = () => {
     setOrientation("horizontal");
     setSelectedShip(null);
     setPlayerBoard([]);
+    setPreviewPosition(null);
+    setShowDirectionSelector(false);
+    setPreviewPositions([]);
   };
 
   const handleShipSelect = (e, ship) => {
@@ -171,7 +214,7 @@ const GameSettings = () => {
                   onChange={(e) => setName(e.target.value)}
                 />
 
-                <div className="container-select">
+                {/* <div className="container-select">
                   <label className="radio-label">
                     <input
                       type="radio"
@@ -194,7 +237,7 @@ const GameSettings = () => {
                     />
                     Vertical
                   </label>
-                </div>
+                </div> */}
 
                 <div>
                   <section className="container-buttons">
@@ -225,15 +268,54 @@ const GameSettings = () => {
 
             <div className="board-grid">
               {localBoard.map((row, x) =>
-                row.map((cell, y) => (
-                  <div
-                    key={`${x}-${y}`}
-                    onClick={() => isNameEntered && handleCellClick(x, y)}
-                    className={`board-cell ${
-                      cell ? cell.split("-")[0].toLowerCase() : ""
-                    } ${!isNameEntered ? "disabled" : ""}`}
-                  />
-                ))
+                row.map((cell, y) => {
+                  const isPreview = previewPositions.some(
+                    (p) => p.xi === x && p.yi === y
+                  );
+                  const shipClass = cell
+                    ? cell.split("-")[0].toLowerCase()
+                    : "";
+
+                  const cellClass = `
+        board-cell
+        ${shipClass}
+        ${!cell && isPreview ? "preview" : ""}
+        ${!isNameEntered ? "disabled" : ""}
+      `;
+
+                  return (
+                    <div
+                      key={`${x}-${y}`}
+                      onClick={() => isNameEntered && handleCellClick(x, y)}
+                      className={cellClass.trim()}
+                    />
+                  );
+                })
+              )}
+
+              {showDirectionSelector && previewPosition && (
+                <div className="direction-selector">
+                  <button
+                    className="button-direction arrow-up"
+                    onClick={() => handleDirectionChange("up")}
+                  ></button>
+                  <button
+                    className="button-direction arrow-left"
+                    onClick={() => handleDirectionChange("left")}
+                  ></button>
+                  <button
+                    className="button-direction arrow-right"
+                    onClick={() => handleDirectionChange("right")}
+                  ></button>
+                  <button
+                    className="button-direction arrow-down"
+                    onClick={() => handleDirectionChange("down")}
+                  ></button>
+                  <button
+                    className="button-ok"
+                    onClick={confirmPlacement}
+                  ></button>
+                </div>
               )}
             </div>
           </div>
