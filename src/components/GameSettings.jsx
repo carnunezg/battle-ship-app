@@ -15,7 +15,7 @@ const GameSettings = () => {
   const [localBoard, setLocalBoard] = useState(createEmptyBoard());
 
   const [selectedShip, setSelectedShip] = useState(null);
-  const [orientation, setOrientation] = useState("horizontal");
+  const [orientation, setOrientation] = useState("right");
   const [placedShips, setPlacedShips] = useState({});
   const [message, setMessage] = useState("");
 
@@ -79,13 +79,7 @@ const GameSettings = () => {
   const handleCellClick = (x, y) => {
     if (!selectedShip) return;
 
-    const defaultDirection = "right";
-    const positions = isValidPlacement(
-      x,
-      y,
-      defaultDirection,
-      selectedShip.size
-    );
+    const positions = isValidPlacement(x, y, orientation, selectedShip.size);
 
     if (!positions) {
       setMessage("No puedes colocar el barco en esa posición.");
@@ -94,7 +88,6 @@ const GameSettings = () => {
     }
 
     setPreviewPosition({ x, y });
-    setOrientation(defaultDirection);
     setPreviewPositions(positions);
     setShowDirectionSelector(true);
   };
@@ -120,20 +113,13 @@ const GameSettings = () => {
   };
 
   const confirmPlacement = () => {
-    if (!previewPosition || !selectedShip) return;
+    if (!previewPosition || !selectedShip || previewPositions.length === 0)
+      return;
 
     const currentCount = placedShips[selectedShip.name] || 0;
-    const positions = isValidPlacement(
-      previewPosition.x,
-      previewPosition.y,
-      orientation,
-      selectedShip.size
-    );
-
-    if (!positions) return;
-
     const newBoard = localBoard.map((row) => [...row]);
-    positions.forEach(({ xi, yi }) => {
+
+    previewPositions.forEach(({ xi, yi }) => {
       newBoard[xi][yi] = `${selectedShip.name}-${currentCount + 1}`;
     });
 
@@ -150,20 +136,24 @@ const GameSettings = () => {
           (ship) => (updated[ship.name] || 0) < ship.count
         );
         setSelectedShip(nextShip || null);
+      } else {
+        setSelectedShip(selectedShip);
       }
+      setOrientation("right");
 
       return updated;
     });
 
     setShowDirectionSelector(false);
     setPreviewPosition(null);
+    setPreviewPositions([]);
   };
 
   const reset = () => {
     setName("");
     setLocalBoard(createEmptyBoard());
     setPlacedShips({});
-    setOrientation("horizontal");
+    setOrientation("right");
     setSelectedShip(null);
     setPlayerBoard([]);
     setPreviewPosition(null);
@@ -174,6 +164,10 @@ const GameSettings = () => {
   const handleShipSelect = (e, ship) => {
     e.preventDefault();
     setSelectedShip(ship);
+    setOrientation("right");
+    setPreviewPosition(null);
+    setPreviewPositions([]);
+    setShowDirectionSelector(false);
     setMessage("");
   };
 
@@ -199,7 +193,7 @@ const GameSettings = () => {
           <h2 className="title-h2">Configuración del Juego</h2>
 
           <div className="container-form-boars">
-            <div className="card">
+            <div className={`card ${showDirectionSelector ? "card-blur" : ""}`}>
               <div className="container-title">
                 <label className="title-h3">Configura tus barcos</label>
               </div>

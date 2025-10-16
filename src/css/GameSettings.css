@@ -399,7 +399,7 @@
 
 .input {
   padding: 12px 16px;
-  width: 300px;
+  width: 305px;
   height: 10px;
   border-radius: 8px;
   border: 2px solid #29f705ae;
@@ -586,24 +586,22 @@ input[type="radio"]:disabled {
 }
 
 .board-cell.preview {
-  background-color: rgba(0, 123, 255, 0.4);
-  border: 1px dashed #007bff;
-  font-weight: bold;
-  text-align: center;
+  background-color: rgb(85, 255, 0, 0.5);
+  border: 1px dashed #29f705da;
 }
 
 /* Colores para celdas del tablero */
 .board-cell.portaaviones {
-  background-color: #2171c1;
+  background-color: #0280ff;
 }
 .board-cell.acorazado {
-  background-color: #31aa31;
+  background-color: #fb37caef;
 }
 .board-cell.crucero {
-  background-color: #d08e14;
+  background-color: #eda113;
 }
 .board-cell.submarino {
-  background-color: #7b087b;
+  background-color: #7c067c;
 }
 
 .cell-hit {
@@ -668,16 +666,16 @@ input[type="radio"]:disabled {
   width: 40px;
   height: 40px;
   font-size: 18px;
-  background: #2774f7;
-  border: 2px solid #2774f7;
+  background: #29f705da;
+  border: 2px solid #29f705da;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 .button-direction:hover {
-  background-color: #306bd2;
-  border: 2px solid #306bd2;
+  background-color: #7af664;
+  border: 2px solid #7af664;
 }
 
 /* Triángulo base (arriba) */
@@ -705,14 +703,14 @@ input[type="radio"]:disabled {
   height: 40px;
   font-size: 18px;
   background: #111111;
-  border: 2px solid #2774f7;
+  border: 2px solid #29f705da;
   cursor: pointer;
   border-radius: 10px;
   transition: background-color 0.2s ease;
 }
 
 .button-ok:hover {
-  background-color: #1a1a1a;
+  background-color: #3d3c3c;
 }
 
 /* Posiciones del control */
@@ -745,8 +743,15 @@ Teléfonos pequeños
 */
 
 @media screen and (max-width: 480px) {
+  .card-blur {
+    /* filter: blur(15px); */
+    /* transition: filter 0.3s ease; */
+
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+  }
   .direction-selector {
-    transform: translate(46px, -200px);
+    transform: translate(46px, -250px);
   }
   .card-info {
     width: 15rem;
@@ -845,7 +850,7 @@ Teléfonos pequeños
 
   .container-buttons {
     gap: 2px;
-    margin: 0;
+    margin-top: 10px;
   }
 
   .button-ship {
@@ -881,7 +886,7 @@ Teléfonos pequeños
   }
 
   .input {
-    width: 155px;
+    width: 157px;
     height: 0px;
     font-size: 12px;
   }
@@ -1051,7 +1056,7 @@ Tablets y pantallas medianas
   }
 
   .input {
-    width: 230px;
+    width: 245px;
     height: 5px;
   }
 
