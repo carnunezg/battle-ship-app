@@ -22,6 +22,14 @@ const GameSettings = () => {
   const [previewPosition, setPreviewPosition] = useState(null);
   const [showDirectionSelector, setShowDirectionSelector] = useState(false);
   const [previewPositions, setPreviewPositions] = useState([]);
+  const [disabledDirections, setDisabledDirections] = useState({
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+  });
+  const [hoveredShip, setHoveredShip] = useState(null);
+  const [editingShipId, setEditingShipId] = useState(null);
 
   const orderedShips = [...ships].sort((a, b) => b.size - a.size);
 
@@ -53,13 +61,47 @@ const GameSettings = () => {
     return next;
   };
 
+  useEffect(() => {
+    if (!previewPosition || !selectedShip) return;
+
+    const newDisabled = {
+      up: !isValidPlacement(
+        previewPosition.x,
+        previewPosition.y,
+        "up",
+        selectedShip.size
+      ),
+      down: !isValidPlacement(
+        previewPosition.x,
+        previewPosition.y,
+        "down",
+        selectedShip.size
+      ),
+      left: !isValidPlacement(
+        previewPosition.x,
+        previewPosition.y,
+        "left",
+        selectedShip.size
+      ),
+      right: !isValidPlacement(
+        previewPosition.x,
+        previewPosition.y,
+        "right",
+        selectedShip.size
+      ),
+    };
+
+    setDisabledDirections(newDisabled);
+  }, [previewPosition, selectedShip]);
+
   const isValidPlacement = (x, y, direction, size) => {
     const newBoard = localBoard;
     const positions = [];
+    let isValid = true;
 
-    for (let i = 0; i < size; i++) {
-      let xi = x,
-        yi = y;
+    Array.from({ length: size }).forEach((_, i) => {
+      let xi = x;
+      let yi = y;
 
       if (direction === "right") yi += i;
       if (direction === "left") yi -= i;
@@ -67,13 +109,14 @@ const GameSettings = () => {
       if (direction === "up") xi -= i;
 
       if (xi < 0 || xi >= 10 || yi < 0 || yi >= 10 || newBoard[xi][yi]) {
-        return null;
+        isValid = false;
+        return;
       }
 
       positions.push({ xi, yi });
-    }
+    });
 
-    return positions;
+    return isValid ? positions : null;
   };
 
   const handleCellClick = (x, y) => {
@@ -93,7 +136,7 @@ const GameSettings = () => {
   };
 
   const handleDirectionChange = (dir) => {
-    if (!previewPosition || !selectedShip) return;
+    if (!previewPosition || !selectedShip || disabledDirections[dir]) return;
 
     const positions = isValidPlacement(
       previewPosition.x,
@@ -101,12 +144,6 @@ const GameSettings = () => {
       dir,
       selectedShip.size
     );
-
-    if (!positions) {
-      setMessage("No puedes colocar el barco en esa dirección.");
-      setTimeout(() => setMessage(""), 3000);
-      return;
-    }
 
     setOrientation(dir);
     setPreviewPositions(positions);
@@ -140,6 +177,7 @@ const GameSettings = () => {
         setSelectedShip(selectedShip);
       }
       setOrientation("right");
+      setEditingShipId(null);
 
       return updated;
     });
@@ -181,12 +219,81 @@ const GameSettings = () => {
     navigate("/game");
   };
 
+  const handleMouseEnter = (x, y) => {
+    const cell = localBoard[x][y];
+    if (cell && !editingShipId && !previewPosition) {
+      const [shipName] = cell.split("-");
+      setMessage(`Haz clic para editar la posición del "${shipName}"`);
+      setHoveredShip(cell);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setMessage("");
+    setHoveredShip(null);
+  };
+
+  const handleEditShip = (shipId) => {
+    const positions = [];
+    localBoard.forEach((row, x) => {
+      row.forEach((cell, y) => {
+        if (cell === shipId) {
+          positions.push({ xi: x, yi: y });
+        }
+      });
+    });
+
+    if (positions.length === 0) return;
+
+    let orientationDetected = "right";
+    if (positions.length > 1) {
+      const dx = positions[1].xi - positions[0].xi;
+      const dy = positions[1].yi - positions[0].yi;
+
+      if (dx === 1) orientationDetected = "down";
+      else if (dx === -1) orientationDetected = "up";
+      else if (dy === 1) orientationDetected = "right";
+      else if (dy === -1) orientationDetected = "left";
+    }
+
+    const newBoard = localBoard.map((row) =>
+      row.map((cell) => (cell === shipId ? null : cell))
+    );
+
+    const [shipName] = shipId.split("-");
+    const updatedCount = (placedShips[shipName] || 1) - 1;
+
+    setLocalBoard(newBoard);
+    setPlacedShips((prev) => ({
+      ...prev,
+      [shipName]: updatedCount,
+    }));
+
+    const shipData = ships.find((s) => s.name === shipName);
+    setEditingShipId(shipId);
+    setSelectedShip(shipData);
+    setOrientation(orientationDetected);
+
+    const first = positions[0];
+    setPreviewPosition({ x: first.xi, y: first.yi });
+    setPreviewPositions(positions);
+    setShowDirectionSelector(true);
+  };
+
   return (
     <main className="background-animated">
       <section className="modal">
         {message && (
           <div>
-            <p className="message-warning">{message}</p>
+            <p
+              className={
+                message.includes("editar") || message.includes("Reubica")
+                  ? "message-player"
+                  : "message-warning"
+              }
+            >
+              {message}
+            </p>
           </div>
         )}
         <div>
@@ -266,21 +373,49 @@ const GameSettings = () => {
                   const isPreview = previewPositions.some(
                     (p) => p.xi === x && p.yi === y
                   );
+
                   const shipClass = cell
                     ? cell.split("-")[0].toLowerCase()
                     : "";
 
+                  const isHovered = hoveredShip && cell === hoveredShip;
+                  const isOtherShip =
+                    cell &&
+                    ((editingShipId && cell !== editingShipId) ||
+                      previewPosition);
+
                   const cellClass = `
-        board-cell
-        ${shipClass}
-        ${!cell && isPreview ? "preview" : ""}
-        ${!isNameEntered ? "disabled" : ""}
-      `;
+  board-cell
+  ${cell ? "ship-cell" : ""}
+  ${shipClass}
+  ${isPreview && !cell ? "preview" : ""}
+  ${isHovered ? "hovered-ship" : ""}
+  ${isOtherShip ? "disabled-ship" : ""}
+  ${!isNameEntered ? "disabled" : ""}
+`;
 
                   return (
                     <div
                       key={`${x}-${y}`}
-                      onClick={() => isNameEntered && handleCellClick(x, y)}
+                      onClick={() => {
+                        if (!isNameEntered) return;
+
+                        if (editingShipId && !cell) {
+                          handleCellClick(x, y);
+                          return;
+                        }
+
+                        if (selectedShip && !editingShipId && !cell) {
+                          handleCellClick(x, y);
+                          return;
+                        }
+
+                        if (cell && !editingShipId && !previewPosition) {
+                          handleEditShip(cell);
+                        }
+                      }}
+                      onMouseEnter={() => handleMouseEnter(x, y)}
+                      onMouseLeave={handleMouseLeave}
                       className={cellClass.trim()}
                     />
                   );
@@ -292,23 +427,26 @@ const GameSettings = () => {
                   <button
                     className="button-direction arrow-up"
                     onClick={() => handleDirectionChange("up")}
+                    disabled={disabledDirections.up}
                   ></button>
                   <button
                     className="button-direction arrow-left"
                     onClick={() => handleDirectionChange("left")}
+                    disabled={disabledDirections.left}
                   ></button>
                   <button
                     className="button-direction arrow-right"
                     onClick={() => handleDirectionChange("right")}
+                    disabled={disabledDirections.right}
                   ></button>
                   <button
                     className="button-direction arrow-down"
                     onClick={() => handleDirectionChange("down")}
+                    disabled={disabledDirections.down}
                   ></button>
-                  <button
-                    className="button-ok"
-                    onClick={confirmPlacement}
-                  ></button>
+                  <button className="button-ok" onClick={confirmPlacement}>
+                    Add
+                  </button>
                 </div>
               )}
             </div>

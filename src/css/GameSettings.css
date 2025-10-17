@@ -707,6 +707,13 @@ input[type="radio"]:disabled {
   cursor: pointer;
   border-radius: 10px;
   transition: background-color 0.2s ease;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 40px;
+  color: #29f705da;
+  text-shadow: 0 0 20px #29f705da, 0 0 30px #29f705da;
 }
 
 .button-ok:hover {
@@ -729,6 +736,24 @@ input[type="radio"]:disabled {
 .direction-selector button:nth-child(5) {
   grid-area: 2 / 2;
 } /* Colocar */
+
+.button-direction:disabled {
+  background-color: #c3c0c0;
+  border: 2px solid #c3c0c0;
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.board-cell.hovered-ship {
+  background-color: rgb(85, 255, 0, 0.5);
+  border: 1px dashed #29f705da;
+  cursor: pointer;
+}
+
+.board-cell.disabled-ship {
+  opacity: 0.4;
+  pointer-events: none;
+}
 
 /*
 .
