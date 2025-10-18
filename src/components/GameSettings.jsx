@@ -3,7 +3,7 @@ import "../css/GameSettings.css";
 import { useState, useContext, useEffect } from "react";
 import { PlayerContext } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
-import { ships } from "../utils/consts";
+import { ships, directions } from "../utils/consts";
 import { createEmptyBoard } from "../utils/createEmptyBoard";
 
 const GameSettings = () => {
@@ -22,12 +22,7 @@ const GameSettings = () => {
   const [previewPosition, setPreviewPosition] = useState(null);
   const [showDirectionSelector, setShowDirectionSelector] = useState(false);
   const [previewPositions, setPreviewPositions] = useState([]);
-  const [disabledDirections, setDisabledDirections] = useState({
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-  });
+  const [disabledDirections, setDisabledDirections] = useState(directions);
   const [hoveredShip, setHoveredShip] = useState(null);
   const [editingShipId, setEditingShipId] = useState(null);
 
@@ -280,6 +275,59 @@ const GameSettings = () => {
     setShowDirectionSelector(true);
   };
 
+  const getCellClass = (cell, x, y) => {
+    const isPreview = previewPositions.some((p) => p.xi === x && p.yi === y);
+    const shipClass = cell ? cell.split("-")[0].toLowerCase() : "";
+    const isHovered = hoveredShip && cell === hoveredShip;
+    const isOtherShip =
+      cell && ((editingShipId && cell !== editingShipId) || previewPosition);
+
+    return `
+    board-cell
+    ${cell ? "ship-cell" : ""}
+    ${shipClass}
+    ${isPreview && !cell ? "preview" : ""}
+    ${isHovered ? "hovered-ship" : ""}
+    ${isOtherShip ? "disabled-ship" : ""}
+    ${!isNameEntered ? "disabled" : ""}
+  `.trim();
+  };
+
+  const handleCellClickWrapper = (cell, x, y) => {
+    if (!isNameEntered) return;
+
+    if (editingShipId && !cell) {
+      handleCellClick(x, y);
+      return;
+    }
+
+    if (selectedShip && !editingShipId && !cell) {
+      handleCellClick(x, y);
+      return;
+    }
+
+    if (cell && !editingShipId && !previewPosition) {
+      handleEditShip(cell);
+    }
+  };
+
+  const handleMouseEnterWrapper = (x, y) => {
+    handleMouseEnter(x, y);
+  };
+
+  const handleShipClick = (e, ship) => {
+    handleShipSelect(e, ship);
+  };
+
+  const isShipEnabled = (ship) => {
+    const nextShip = getNextShipToPlace();
+    return isNameEntered && ship.name === nextShip;
+  };
+
+  const getShipButtonClass = (ship) => {
+    return `button-ship ${selectedShip?.name === ship.name ? "selected" : ""}`;
+  };
+
   return (
     <main className="background-animated">
       <section className="modal">
@@ -345,17 +393,13 @@ const GameSettings = () => {
                     {orderedShips.map((ship) => {
                       const remaining =
                         ship.count - (placedShips[ship.name] || 0);
-                      const nextShip = getNextShipToPlace();
-                      const isEnabled = isNameEntered && ship.name === nextShip;
 
                       return (
                         <button
-                          className={`button-ship ${
-                            selectedShip?.name === ship.name ? "selected" : ""
-                          }`}
                           key={ship.name}
-                          disabled={!isEnabled}
-                          onClick={(e) => handleShipSelect(e, ship)}
+                          className={getShipButtonClass(ship)}
+                          disabled={!isShipEnabled(ship)}
+                          onClick={(e) => handleShipClick(e, ship)}
                         >
                           {ship.name} <br /> ({ship.size} celdas) <br />
                           Cantidad: {remaining}
@@ -369,57 +413,15 @@ const GameSettings = () => {
 
             <div className="board-grid">
               {localBoard.map((row, x) =>
-                row.map((cell, y) => {
-                  const isPreview = previewPositions.some(
-                    (p) => p.xi === x && p.yi === y
-                  );
-
-                  const shipClass = cell
-                    ? cell.split("-")[0].toLowerCase()
-                    : "";
-
-                  const isHovered = hoveredShip && cell === hoveredShip;
-                  const isOtherShip =
-                    cell &&
-                    ((editingShipId && cell !== editingShipId) ||
-                      previewPosition);
-
-                  const cellClass = `
-  board-cell
-  ${cell ? "ship-cell" : ""}
-  ${shipClass}
-  ${isPreview && !cell ? "preview" : ""}
-  ${isHovered ? "hovered-ship" : ""}
-  ${isOtherShip ? "disabled-ship" : ""}
-  ${!isNameEntered ? "disabled" : ""}
-`;
-
-                  return (
-                    <div
-                      key={`${x}-${y}`}
-                      onClick={() => {
-                        if (!isNameEntered) return;
-
-                        if (editingShipId && !cell) {
-                          handleCellClick(x, y);
-                          return;
-                        }
-
-                        if (selectedShip && !editingShipId && !cell) {
-                          handleCellClick(x, y);
-                          return;
-                        }
-
-                        if (cell && !editingShipId && !previewPosition) {
-                          handleEditShip(cell);
-                        }
-                      }}
-                      onMouseEnter={() => handleMouseEnter(x, y)}
-                      onMouseLeave={handleMouseLeave}
-                      className={cellClass.trim()}
-                    />
-                  );
-                })
+                row.map((cell, y) => (
+                  <div
+                    key={`${x}-${y}`}
+                    onClick={() => handleCellClickWrapper(cell, x, y)}
+                    onMouseEnter={() => handleMouseEnterWrapper(x, y)}
+                    onMouseLeave={handleMouseLeave}
+                    className={getCellClass(cell, x, y)}
+                  />
+                ))
               )}
 
               {showDirectionSelector && previewPosition && (
