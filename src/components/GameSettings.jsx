@@ -5,6 +5,8 @@ import { PlayerContext } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
 import { ships, directions } from "../utils/consts";
 import { createEmptyBoard } from "../utils/createEmptyBoard";
+import BoardCell from "./BoardCell";
+import DirectionSelector from "./DirectionSelector";
 
 const GameSettings = () => {
   const { setPlayer, setPlayerBoard } = useContext(PlayerContext);
@@ -130,58 +132,6 @@ const GameSettings = () => {
     setShowDirectionSelector(true);
   };
 
-  const handleDirectionChange = (dir) => {
-    if (!previewPosition || !selectedShip || disabledDirections[dir]) return;
-
-    const positions = isValidPlacement(
-      previewPosition.x,
-      previewPosition.y,
-      dir,
-      selectedShip.size
-    );
-
-    setOrientation(dir);
-    setPreviewPositions(positions);
-  };
-
-  const confirmPlacement = () => {
-    if (!previewPosition || !selectedShip || previewPositions.length === 0)
-      return;
-
-    const currentCount = placedShips[selectedShip.name] || 0;
-    const newBoard = localBoard.map((row) => [...row]);
-
-    previewPositions.forEach(({ xi, yi }) => {
-      newBoard[xi][yi] = `${selectedShip.name}-${currentCount + 1}`;
-    });
-
-    setLocalBoard(newBoard);
-    setPlacedShips((prev) => {
-      const updated = {
-        ...prev,
-        [selectedShip.name]: currentCount + 1,
-      };
-
-      const remaining = selectedShip.count - (updated[selectedShip.name] || 0);
-      if (remaining === 0) {
-        const nextShip = orderedShips.find(
-          (ship) => (updated[ship.name] || 0) < ship.count
-        );
-        setSelectedShip(nextShip || null);
-      } else {
-        setSelectedShip(selectedShip);
-      }
-      setOrientation("right");
-      setEditingShipId(null);
-
-      return updated;
-    });
-
-    setShowDirectionSelector(false);
-    setPreviewPosition(null);
-    setPreviewPositions([]);
-  };
-
   const reset = () => {
     setName("");
     setLocalBoard(createEmptyBoard());
@@ -275,24 +225,6 @@ const GameSettings = () => {
     setShowDirectionSelector(true);
   };
 
-  const getCellClass = (cell, x, y) => {
-    const isPreview = previewPositions.some((p) => p.xi === x && p.yi === y);
-    const shipClass = cell ? cell.split("-")[0].toLowerCase() : "";
-    const isHovered = hoveredShip && cell === hoveredShip;
-    const isOtherShip =
-      cell && ((editingShipId && cell !== editingShipId) || previewPosition);
-
-    return `
-    board-cell
-    ${cell ? "ship-cell" : ""}
-    ${shipClass}
-    ${isPreview && !cell ? "preview" : ""}
-    ${isHovered ? "hovered-ship" : ""}
-    ${isOtherShip ? "disabled-ship" : ""}
-    ${!isNameEntered ? "disabled" : ""}
-  `.trim();
-  };
-
   const handleCellClickWrapper = (cell, x, y) => {
     if (!isNameEntered) return;
 
@@ -363,31 +295,6 @@ const GameSettings = () => {
                   onChange={(e) => setName(e.target.value)}
                 />
 
-                {/* <div className="container-select">
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="orientation"
-                      value="horizontal"
-                      checked={orientation === "horizontal"}
-                      onChange={(e) => setOrientation(e.target.value)}
-                      disabled={!name.trim()}
-                    />
-                    Horizontal
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="orientation"
-                      value="vertical"
-                      checked={orientation === "vertical"}
-                      onChange={(e) => setOrientation(e.target.value)}
-                      disabled={!name.trim()}
-                    />
-                    Vertical
-                  </label>
-                </div> */}
-
                 <div>
                   <section className="container-buttons">
                     {orderedShips.map((ship) => {
@@ -414,42 +321,42 @@ const GameSettings = () => {
             <div className="board-grid">
               {localBoard.map((row, x) =>
                 row.map((cell, y) => (
-                  <div
+                  <BoardCell
                     key={`${x}-${y}`}
-                    onClick={() => handleCellClickWrapper(cell, x, y)}
-                    onMouseEnter={() => handleMouseEnterWrapper(x, y)}
-                    onMouseLeave={handleMouseLeave}
-                    className={getCellClass(cell, x, y)}
+                    cell={cell}
+                    x={x}
+                    y={y}
+                    isNameEntered={isNameEntered}
+                    previewPositions={previewPositions}
+                    hoveredShip={hoveredShip}
+                    editingShipId={editingShipId}
+                    previewPosition={previewPosition}
+                    handleCellClickWrapper={handleCellClickWrapper}
+                    handleMouseEnterWrapper={handleMouseEnterWrapper}
+                    handleMouseLeave={handleMouseLeave}
                   />
                 ))
               )}
 
               {showDirectionSelector && previewPosition && (
-                <div className="direction-selector">
-                  <button
-                    className="button-direction arrow-up"
-                    onClick={() => handleDirectionChange("up")}
-                    disabled={disabledDirections.up}
-                  ></button>
-                  <button
-                    className="button-direction arrow-left"
-                    onClick={() => handleDirectionChange("left")}
-                    disabled={disabledDirections.left}
-                  ></button>
-                  <button
-                    className="button-direction arrow-right"
-                    onClick={() => handleDirectionChange("right")}
-                    disabled={disabledDirections.right}
-                  ></button>
-                  <button
-                    className="button-direction arrow-down"
-                    onClick={() => handleDirectionChange("down")}
-                    disabled={disabledDirections.down}
-                  ></button>
-                  <button className="button-ok" onClick={confirmPlacement}>
-                    Add
-                  </button>
-                </div>
+                <DirectionSelector
+                  disabledDirections={disabledDirections}
+                  previewPosition={previewPosition}
+                  setPreviewPositions={setPreviewPositions}
+                  selectedShip={selectedShip}
+                  previewPositions={previewPositions}
+                  isValidPlacement={isValidPlacement}
+                  setOrientation={setOrientation}
+                  setLocalBoard={setLocalBoard}
+                  setSelectedShip={setSelectedShip}
+                  localBoard={localBoard}
+                  setShowDirectionSelector={setShowDirectionSelector}
+                  setPreviewPosition={setPreviewPosition}
+                  placedShips={placedShips}
+                  setPlacedShips={setPlacedShips}
+                  orderedShips={orderedShips}
+                  setEditingShipId={setEditingShipId}
+                />
               )}
             </div>
           </div>
