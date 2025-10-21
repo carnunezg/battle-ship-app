@@ -267,7 +267,7 @@ const GameSettings = () => {
           <div>
             <p
               className={
-                message.includes("editar") || message.includes("Reubica")
+                message.includes("editar")
                   ? "message-player"
                   : "message-warning"
               }
