@@ -5,6 +5,7 @@ import { ships } from "../utils/consts";
 import { createEmptyBoard } from "../utils/createEmptyBoard";
 import { computerShoot } from "../utils/computerShoot";
 import { generateComputerBoard } from "../utils/generateBoard";
+import { checkIfShipSunk } from "../utils/checkIfShipSunk";
 
 const GameBattleShip = () => {
   const { player, playerBoard } = useContext(PlayerContext);
@@ -139,23 +140,6 @@ const GameBattleShip = () => {
     }
 
     return shot.result === "hit" ? "cell-hit" : "cell-miss";
-  };
-  const checkIfShipSunk = (board, shots, shipName) => {
-    const positions = [];
-
-    board.forEach((row, x) => {
-      row.forEach((cell, y) => {
-        if (cell === shipName) {
-          positions.push({ x, y });
-        }
-      });
-    });
-
-    return positions.every((pos) =>
-      shots.some(
-        (shot) => shot.x === pos.x && shot.y === pos.y && shot.result === "hit"
-      )
-    );
   };
 
   const getShipSummary = (sunkShips, shipList) => {
